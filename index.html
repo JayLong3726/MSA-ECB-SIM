@@ -8,30 +8,43 @@
 </head>
 <body>
 <header class="appbar">
-  <div class="brand">ECB TRAINING SIMULATOR</div>
-  <div class="appbar-right">LOCAL SESSION · ECB-ALPHA</div>
+  <strong>ECB TRAINING SIMULATOR</strong>
+  <span>ECB-ALPHA</span>
 </header>
 
 <main class="workspace">
-  <section class="m1-shell" aria-label="MSA Entry Control Board training display">
+  <section class="m1-shell">
     <div class="m1-screen">
-      <div class="m1-top">
-        <button class="menu-button" aria-label="Menu">
-          <i></i><i></i><i></i>
-        </button>
-        <div class="header-copy">
-          <div class="ecp-name">ECP ALPHA</div>
+      <header class="m1-header">
+        <button class="hamburger" aria-label="Menu"><i></i><i></i><i></i></button>
+        <div class="heading">
+          <div class="ecp">ECP ALPHA</div>
           <div class="clock" id="clock">13:14</div>
         </div>
-        <div class="battery">BAT <span id="battery">100</span>%</div>
-      </div>
+        <div class="battery">BAT <b id="battery">100</b>%</div>
+      </header>
 
-      <div class="screen-body">
-        <div class="slot-list" id="slots"></div>
-      </div>
+      <section class="board" id="board"></section>
+    </div>
+
+    <div class="sim-controls">
+      <button id="tallyBtn">PLACE TALLY</button>
+      <button id="resetBtn">RESET</button>
     </div>
   </section>
 </main>
+
+<div class="modal-backdrop hidden" id="teamModal">
+  <div class="team-modal">
+    <div class="modal-title">Select a team name</div>
+    <label for="teamName">Team Name</label>
+    <input id="teamName" placeholder="e.g. Alpha 1">
+    <div class="modal-actions">
+      <button id="cancelTeam">CANCEL</button>
+      <button id="saveTeam">OK</button>
+    </div>
+  </div>
+</div>
 
 <script src="simulator.js"></script>
 </body>
