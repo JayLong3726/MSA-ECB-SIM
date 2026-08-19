@@ -1,1218 +1,239 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MSA M1 ECB Training Simulator V16</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECB Training Simulator</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;background:#071016;color:#fff;font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}
-.top{height:54px;background:#073f5d;border-bottom:3px solid #ed1c24;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-weight:900;font-size:14px}.top button{background:#3d5058;color:#fff;border:0;padding:9px 12px;border-radius:3px;font-size:10px;font-weight:900}
-.page{min-height:calc(100vh - 54px);display:flex;align-items:flex-start;justify-content:center;padding:22px}.board-wrap{width:min(980px,96vw)}
-.ecb-shell{position:relative;width:100%;max-width:720px;margin:auto;background:#20272b;border:1px solid #465157;border-radius:12px;padding:20px;box-shadow:0 18px 45px #0008}.ecb-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#dce4e8;font-size:11px;font-weight:900}.ecb-title span:last-child{color:#8da1aa}
-.screen-frame{width:min(560px,82vw);margin:0 auto;background:#090c0d;border:7px solid #07090a;border-radius:5px;padding:4px;box-shadow:inset 0 0 14px #000}.screen{position:relative;background:#c9cccd;color:#111;min-height:650px;overflow:hidden}.screen-head{height:58px;background:#343b3f;color:#fff;display:flex;align-items:center;padding:0 10px;gap:10px;font-size:14px;font-weight:900}.hamb{border:0;background:none;color:#fff;font-size:22px;padding:0;line-height:1}.grow{flex:1;text-align:left;padding-left:2px}.mode{font-size:12px;font-weight:900}.conn{font-size:11px;font-weight:900;color:#19b65a;white-space:nowrap}.battery{font-size:12px;white-space:nowrap}.battery b{font-size:13px}
-.rows{padding:3px;background:#c9cccd}.row{display:grid;grid-template-columns:36px 1fr 96px;min-height:88px;margin-bottom:2px;border:1px solid #f2f2f2;background:#777e82}.row:last-child{margin-bottom:0}.num{display:flex;align-items:center;justify-content:center;background:#737a7e;color:#fff;font-size:16px;font-weight:900}.num.committed{background:#0aa34a}.content{background:#fff;color:#111;padding:4px 8px;min-width:0;position:relative}.place{background:#777e82;color:#fff;display:flex;align-items:center;font-size:12px;font-style:italic}.name{font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pressure{font-size:22px;font-weight:900;line-height:1.03}.pressure small{font-size:10px}.bar{height:4px;background:#13a34a;margin-top:3px}.bar.amber{background:#d6a900}.bar.red{background:#ed1c24}.meta{display:flex;justify-content:space-between;gap:8px;font-size:9px;margin-top:4px;white-space:nowrap}.telemetry-dot{font-weight:900}.action{border:0;background:#ed1c24;color:#fff;font-size:10px;white-space:nowrap;font-weight:900;line-height:1.05;min-width:86px;padding:0 4px}.action:hover{background:#c9161c}.alarm-panel{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#ed1c24;color:#fff;font-size:11px;font-weight:900;padding:7px 7px;margin:4px -8px -4px;min-height:36px}.alarm-panel.flash{animation:alarmFlash .85s steps(2,end) infinite}.alarm-panel.acknowledged{animation:none}.alarm-label{flex:1;text-align:center}.confirm{background:#fff;color:#111;border:2px solid #fff;padding:8px 13px;font-size:11px;font-weight:900;border-radius:2px;min-width:82px;box-shadow:0 1px 0 #333}.alarm-row,.low-row{background:#ed1c24!important;border-color:#fff}.alarm-row .content,.alarm-row .num,.low-row .content,.low-row .num{background:#ed1c24;color:#fff}.alarm-row .content .pressure,.alarm-row .content .name,.alarm-row .content .meta{color:#fff}.alarm-row .bar{background:#fff}.alarm-row .action,.low-row .action{background:#ed1c24;color:#fff!important;border-left:2px solid #fff;font-size:10px;min-width:74px}.alarm-row .action:hover,.low-row .action:hover{background:#c9161c}.low-row .content,.low-row .num{background:#ed1c24;color:#fff}.low-row .content .pressure,.low-row .content .name,.low-row .content .meta{color:#fff}.ttw-warning .content,.ttw-warning .num{animation:channelFlash 1s steps(2,end) infinite}.evac-sent .content,.evac-sent .num,.evac-received .content,.evac-received .num,.evac-confirmed .content,.evac-confirmed .num{background:inherit;color:inherit;animation:none}.evac-status{display:inline-flex;align-items:center;justify-content:center;min-width:42px;padding:4px 5px;font-size:7px;font-weight:900;background:#fff;color:#111;margin-left:3px}.evac-status.red{color:#ed1c24}.evac-status.yellow{color:#a98b00}.evac-status.green{color:#159f50}.evac-action{background:#ed1c24!important;color:#fff!important;min-width:86px;font-size:10px;line-height:1.05}.evac-action b{display:block;font-size:10px;letter-spacing:.1px}.evac-action.sent{background:#ed1c24!important}.evac-action.received{background:#d6b900!important;color:#111!important}.evac-action.confirmed{background:#159f50!important;color:#fff!important}.evac-status{border:1px solid #d5d5d5}.alarm-row.confirmed-alarm .alarm-panel,.low-row.confirmed-alarm .alarm-panel{background:#ed1c24;animation:none}.alarm-row .confirm,.low-row .confirm{font-size:10px;min-height:28px}.double-confirm{background:#159f50!important;color:#fff!important}.evac-action.received{background:#d6b900!important;color:#111!important}.evac-action.confirmed{background:#159f50!important;color:#fff!important}.evac-label{display:block;font-size:7px;margin-top:2px;line-height:1.05}
-@keyframes alarmFlash{50%{opacity:.2}}@keyframes channelFlash{50%{background:#d6a900;color:#111}}@keyframes evacPulse{50%{background:#a40000}}
-.menu{display:none;position:absolute;z-index:40;left:0;top:58px;width:72%;max-width:280px;height:calc(100% - 58px);background:#20272b;border-right:1px solid #657178;box-shadow:12px 0 30px #0008;padding:8px}.menu.open{display:block}.menu-title{font-size:12px;font-weight:900;padding:8px 7px;color:#fff;border-bottom:1px solid #4d5a60;margin-bottom:5px}.menu button{width:100%;display:block;text-align:left;background:#3b474d;color:#fff;border:1px solid #59666c;padding:10px 9px;margin:3px 0;font-size:10px;font-weight:900}.menu button.active{background:#159f50}.menu button.secondary{background:#26343a}.menu-note{font-size:8px;color:#9ba9ae;padding:8px 7px}
-.footer-controls{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}.footer-controls button{border:0;background:#45575f;color:#fff;padding:9px 12px;font-size:10px;font-weight:900}.footer-controls .red{background:#ed1c24}
-.controller{width:min(1100px,96vw);margin:auto;background:#172126;border:1px solid #3c4d55;border-radius:9px;overflow:hidden}.controller h2{margin:0;background:#073f5d;padding:14px 16px;font-size:16px;border-bottom:3px solid #ed1c24}.controller-body{padding:12px}.info{background:#26353b;border-radius:5px;padding:10px;font-size:10px;color:#d6e0e4;margin-bottom:10px}.actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.actions button,.card button{border:0;border-radius:4px;background:#40535c;color:#fff;padding:8px 10px;font-size:10px;font-weight:900}.actions .green{background:#159f50}.actions .red{background:#ed1c24}.card{background:#222e34;border:1px solid #405159;border-radius:6px;padding:10px;margin-bottom:8px}.card-head{display:flex;justify-content:space-between;gap:10px;font-weight:900;font-size:11px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}label{display:block;font-size:8px;color:#aebbc1;margin-bottom:2px}input,select{width:100%;background:#0d1215;color:#fff;border:1px solid #4c5a61;border-radius:3px;padding:7px;font-size:10px}.card-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.active-red{background:#ed1c24!important}.active-amber{background:#d2aa00!important;color:#111!important}.active-green{background:#159f50!important}.active-yellow{background:#f2d11b!important;color:#111!important}.badge{font-size:8px;padding:5px 7px;border-radius:4px;background:#176b3b}.controller-alarm{margin-top:8px;padding:7px;text-align:center;font-size:9px;font-weight:900;background:#ed1c24}.controller-alarm.flash{animation:alarmFlash .85s steps(2,end) infinite}.controller-evac{margin-top:8px;padding:7px;text-align:center;font-size:9px;font-weight:900}.controller-evac.red{background:#ed1c24}.controller-evac.yellow{background:#f2d11b;color:#111}.controller-evac.green{background:#159f50}
-.modal-bg{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center}.modal-bg.open{display:flex}.modal{width:min(440px,94vw);background:#20292e;border:1px solid #59686e;border-radius:8px;padding:15px;box-shadow:0 20px 60px #000}.modal h2{margin:0 0 11px;font-size:15px}.field{margin:7px 0}.field label{font-size:9px}.field input{font-size:12px;padding:8px}.team-title{font-size:9px;font-weight:900;color:#aebbc1;margin:12px 0 6px}.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.team-btn{border:0;border-radius:3px;color:#fff;padding:9px;text-align:left;font-weight:900;background:#4f5a5f}.team-btn.new{background:#159f50}.team-btn span{display:block;font-size:10px}.team-btn small{display:block;font-size:7px;margin-top:2px}.modal-actions{margin-top:10px;display:flex;gap:6px}.modal-actions button{flex:1;border:0;background:#45575f;color:#fff;padding:8px;font-weight:900}
-.reset-bg{display:none;position:fixed;inset:0;background:#000c;z-index:180;align-items:center;justify-content:center}.reset-bg.open{display:flex}.reset-box{width:min(420px,92vw);background:#20292e;border:1px solid #65747a;border-radius:7px;padding:16px;box-shadow:0 20px 60px #000}.reset-box h2{margin:0 0 8px;font-size:16px}.reset-box p{font-size:11px;line-height:1.5;color:#d5dde0}.reset-actions{display:flex;gap:7px;margin-top:14px}.reset-actions button{flex:1;border:0;background:#45575f;color:#fff;padding:10px;font-size:10px;font-weight:900}.reset-actions .danger{background:#ed1c24}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#20282c;border:1px solid #69777d;color:#fff;padding:9px 12px;border-radius:4px;font-size:10px;display:none;z-index:200}.toast.show{display:block}.hidden{display:none!important}
-@media(max-width:650px){.page{padding:12px}.screen-frame{width:96vw}.grid{grid-template-columns:1fr}.top{padding:0 10px}.screen{min-height:620px}}
+  * { box-sizing: border-box; }
 
-.empty-slot{min-height:69px;background:#777d81}
-.empty-slot .slot-content.place{background:#777d81;color:#fff}
-.empty-slot .slot-action{background:#555c60;color:#fff}
-.alarm-panel{border:2px solid #fff;box-shadow:inset 0 0 0 1px #8c0000}.alarm-panel .confirm{min-width:96px}.acknowledged .confirm{background:#f0f0f0}.controller-section-title{font-size:10px;font-weight:900;color:#dbe4e8;border-bottom:1px solid #415159;padding:8px 0 5px;margin-top:8px}.mini-state{font-size:8px;padding:4px 6px;background:#314249;color:#dbe4e8;border-radius:3px}.controller-card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.controller-card-grid button{min-height:34px}.muted{opacity:.65}@media(max-width:800px){.controller-card-grid{grid-template-columns:repeat(2,1fr)}}
+  :root{
+    --screen:#5b6063;
+    --slot:#878d8f;
+    --white:#f3f4f4;
+    --navy:#071118;
+    --red:#ed1c24;
+  }
 
-/* V10 M1 visual refinement */
-:root{
-  --m1-black:#090b0c;
-  --m1-header:#343a3d;
-  --m1-mid:#70777b;
-  --m1-light:#d7d9da;
-  --m1-white:#f7f7f7;
-  --m1-yellow:#e4b900;
-  --m1-green:#159447;
-  --m1-red:#d71920;
-  --m1-amber:#d6a900;
-}
-body{
-  font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif !important;
-  letter-spacing:-.12px;
-}
-.screen{
-  font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif !important;
-  background:var(--m1-light) !important;
-  border:7px solid var(--m1-black) !important;
-  border-radius:3px !important;
-  box-shadow:inset 0 0 10px #111 !important;
-}
-.screen-head{
-  height:42px !important;
-  background:var(--m1-header) !important;
-  padding:0 9px !important;
-  font-size:12px !important;
-  font-weight:700 !important;
-  letter-spacing:-.25px !important;
-}
-.screen-head button{
-  font-size:18px !important;
-  font-weight:700 !important;
-}
-.screen-head .small{
-  font-size:10px !important;
-  font-weight:700 !important;
-}
-.battery{
-  font-size:10px !important;
-  font-weight:700 !important;
-}
-.screen-body{
-  height:calc(100% - 42px) !important;
-  padding:2px !important;
-  background:var(--m1-light) !important;
-}
-.slot{
-  min-height:66px !important;
-  margin-bottom:1px !important;
-  grid-template-columns:34px 1fr 67px !important;
-  border:1px solid #b7babc !important;
-  background:var(--m1-mid) !important;
-}
-.slot-no{
-  font-size:16px !important;
-  font-weight:700 !important;
-  background:var(--m1-mid) !important;
-}
-.slot-content{
-  padding:4px 7px !important;
-  background:var(--m1-white) !important;
-}
-.slot-content.place{
-  font-size:12px !important;
-  font-weight:700 !important;
-  background:var(--m1-mid) !important;
-}
-.wname{
-  font-size:10px !important;
-  font-weight:700 !important;
-}
-.pressure{
-  font-size:23px !important;
-  font-weight:700 !important;
-  letter-spacing:-.6px !important;
-}
-.pressure small{
-  font-size:10px !important;
-}
-.pressbar{
-  height:5px !important;
-  margin-top:2px !important;
-}
-.meta{
-  font-size:9px !important;
-  font-weight:700 !important;
-  margin-top:3px !important;
-}
-.slot-action{
-  font-size:10px !important;
-  font-weight:700 !important;
-  letter-spacing:-.2px !important;
-  background:#555b5f !important;
-}
-.slot-action.red{
-  background:#555b5f !important;
-}
-.alarm-strip{
-  font-size:9px !important;
-  font-weight:700 !important;
-  padding:4px !important;
-  margin:-4px -7px 3px !important;
-}
-.ack{
-  font-size:9px !important;
-  font-weight:700 !important;
-  min-height:24px !important;
-}
-.team-strip button{
-  font-size:10px !important;
-  font-weight:700 !important;
-  padding:7px 4px !important;
-}
-.empty-slot{
-  min-height:66px !important;
-}
-.empty-slot .slot-no{
-  background:var(--m1-mid) !important;
-}
-.empty-slot .slot-content.place{
-  background:var(--m1-mid) !important;
-}
+  html,body{
+    margin:0;
+    min-height:100%;
+    background:var(--navy);
+    font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif;
+  }
 
-</style>
+  body{
+    color:white;
+    overflow-x:hidden;
+  }
 
-<style id="v11-m1-visual">
-/* V11 M1 visual scale — the display is intentionally larger for training use. */
-.ecb-shell{max-width:980px!important;padding:26px!important}
-.screen-frame{width:min(760px,92vw)!important;max-width:760px!important;padding:6px!important}
-.screen{min-height:820px!important}
-.screen-head{height:58px!important;min-height:58px!important;font-size:15px!important;padding:0 13px!important;gap:12px!important}
-.screen-head .grow{font-size:14px!important;font-weight:900!important}
-.screen-head .mode{font-size:13px!important}
-.screen-head .conn{font-size:12px!important}
-.screen-head .battery{font-size:12px!important}
-.screen-head .battery b{font-size:14px!important}
-.rows{padding:4px!important}
-.row{grid-template-columns:48px 1fr 112px!important;min-height:108px!important;margin-bottom:3px!important}
-.num{font-size:21px!important}
-.num.committed{background:#e6bb00!important;color:#fff!important}
-.content{padding:7px 10px!important}
-.place{font-size:14px!important;font-style:normal!important;font-weight:700!important}
-.name{font-size:12px!important}
-.pressure{font-size:30px!important}
-.pressure small{font-size:12px!important}
-.bar{height:6px!important;margin-top:4px!important}
-.meta{font-size:11px!important;margin-top:5px!important}
-.action,.evac-action{background:#555b5f!important;color:#fff!important;min-width:112px!important;font-size:12px!important}
-.evac-action b{font-size:12px!important}
-.evac-action.sent{background:#ed1c24!important}
-.evac-action.received{background:#d6b900!important;color:#111!important}
-.evac-action.confirmed{background:#159f50!important;color:#fff!important}
-.alarm-row .action,.low-row .action{min-width:112px!important}
-.alarm-panel{font-size:13px!important;padding:9px!important;min-height:44px!important}
-.alarm-panel .confirm{font-size:12px!important;min-width:104px!important}
-.footer-controls{justify-content:center}
-.footer-controls button{font-size:12px!important;padding:11px 15px!important}
-/* Controller is a separate instructor station, not a phone mock-up. */
-.controller{width:min(1280px,96vw)!important}
-.controller h2{font-size:20px!important;padding:16px 18px!important}
-.controller-body{padding:16px!important}
-.controller .info{font-size:12px!important}
-.controller-card-grid{grid-template-columns:repeat(4,1fr)!important}
-.controller-card-grid button{font-size:11px!important;min-height:42px!important}
-@media(max-width:900px){.screen-frame{width:96vw!important}.screen{min-height:720px!important}.row{grid-template-columns:42px 1fr 94px!important;min-height:90px!important}.pressure{font-size:25px!important}.controller-card-grid{grid-template-columns:repeat(2,1fr)!important}}
-</style>
-<style>.empty-controller-card{border-style:dashed!important}.force-btn{width:100%;border:0;background:#159f50;color:#fff;padding:11px;font-weight:900;font-size:11px;border-radius:4px}.controller-card-grid{grid-template-columns:repeat(3,1fr)!important}</style><style>.event-log{margin-top:8px;font-size:10px;line-height:1.5;color:#d8e0e3;max-height:220px;overflow:auto}.event-log div{padding:4px 0;border-bottom:1px solid #36464d}.event-log b{color:#aebbc1}.empty-controller-card{border-style:dashed!important}</style><style>
-/* V15 — M1 close visual correction */
-.screen-frame{width:min(700px,92vw)!important;max-width:700px!important}
-.screen{min-height:900px!important;background:#d5d7d8!important}
-.screen-head{height:88px!important;min-height:88px!important;padding:10px 14px!important;background:#5b6164!important}
-.ecp-name{font-size:18px!important;line-height:1.05!important;font-weight:700!important;letter-spacing:.1px!important}
-.ecp-time{font-size:28px!important;line-height:1!important;font-weight:400!important}
-.ecp-operator{display:none!important}
-.head-status{margin-left:auto!important}.head-status .battery{font-size:12px!important;font-weight:700!important}.head-status .battery b{font-size:14px!important}
-.rows{padding:5px 6px!important;background:#d5d7d8!important}
-.row{grid-template-columns:72px 1fr 88px!important;min-height:0!important;height:auto!important;margin-bottom:4px!important;border:0!important;background:#fff!important}
-.empty-slot{height:calc((900px - 88px - 40px)/6)!important;min-height:95px!important;background:#7b8082!important;border:0!important}
-.empty-slot .num{font-size:22px!important;background:#7b8082!important;border:0!important}.empty-slot .content.place{font-size:20px!important;font-weight:400!important;background:#7b8082!important;border:0!important;padding-left:14px!important}
-.content{padding:9px 12px!important}.name{font-size:11px!important}.pressure{font-size:33px!important;line-height:1!important;font-weight:500!important;letter-spacing:-.6px!important}.pressure small{font-size:20px!important;font-weight:400!important}.bar{height:6px!important;margin-top:5px!important}.meta{font-size:12px!important;margin-top:7px!important;color:#4f5558!important}.m1-icon{width:17px!important;height:17px!important}.m1-bin{width:18px!important;height:18px!important;color:#111!important}.action,.evac-action{min-width:88px!important;font-size:10px!important;background:#646a6d!important;border:0!important}.evac-action b{font-size:10px!important}.slot-action{min-width:88px!important}
-.row .num.committed{background:#8bd43f!important;color:#fff!important;font-size:22px!important}.row .content{min-height:94px!important}.evac-action.sent{background:#e34a3e!important}.evac-action.received{background:#d9b800!important;color:#fff!important}.evac-action.confirmed{background:#7d8588!important;color:#fff!important}.alarm-panel{font-size:18px!important;min-height:58px!important;padding:10px!important;margin:8px -12px -9px!important}.alarm-panel .confirm{font-size:13px!important;min-width:120px!important}.alarm-row .content,.low-row .content{background:#e45745!important;color:#fff!important}.alarm-row .num,.low-row .num{background:#666c6f!important;color:#fff!important}
-.evac-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}.evac-bg.open{display:flex}.evac-box{width:min(430px,90vw);background:#f4f4f4;color:#666;padding:26px 28px 20px;box-shadow:0 5px 20px rgba(0,0,0,.4);font-family:Arial,sans-serif}.evac-box p{margin:0 0 25px;font-size:16px;line-height:1.45;text-align:center}.evac-actions{display:flex;justify-content:flex-end;gap:14px;align-items:center}.evac-actions button{border:0;background:transparent;color:#777;font-weight:600;padding:12px 16px}.evac-actions .evac-confirm-button{background:#e56a3c;color:#fff;min-width:140px;font-weight:700}
-@media(max-width:900px){.screen-frame{width:96vw!important}.screen{min-height:820px!important}.empty-slot{min-height:90px!important}.pressure{font-size:28px!important}.row{grid-template-columns:58px 1fr 78px!important}.empty-slot .content.place{font-size:17px!important}.empty-slot .num{font-size:19px!important}}
-</style>
-<style>
-/* V16: M1 interaction-flow and typography refinement */
-.m1-hidden-controls{display:none!important}
-.screen-head{height:70px!important;background:#596064!important;padding:0 14px!important}
-.ecp-name{font-size:14px!important;font-weight:700!important;line-height:1.05!important}.ecp-time{font-size:25px!important;font-weight:400!important;line-height:1.05!important}.head-status .battery{font-size:10px!important}.head-status .battery b{font-size:11px!important}
-.rows{padding:4px!important;background:#f0f1f1!important}
-.row{grid-template-columns:46px 1fr 76px!important;min-height:91px!important;background:#fff!important;border:0!important;margin-bottom:4px!important}
-.empty-slot{min-height:calc((100% - 20px)/6)!important;height:auto!important;background:#9a9fa2!important;border:0!important}
-.empty-slot .num{font-size:17px!important;background:#747a7d!important}.empty-slot .content.place{font-size:16px!important;background:#9a9fa2!important;font-style:italic!important;font-weight:400!important;padding-left:14px!important}
-.occupied-row .num.committed{background:#7bd23b!important;color:#fff!important;font-size:19px!important}.occupied-row .content{padding:8px 12px 5px!important}.pressure-line{display:flex!important;align-items:baseline!important;justify-content:space-between!important;gap:10px!important;min-height:31px!important}.pressure{font-size:29px!important;font-weight:400!important;line-height:1!important;white-space:nowrap!important}.pressure small{font-size:15px!important;font-weight:400!important;margin-left:1px!important}.m1-status-text{font-size:11px!important;color:#777!important;white-space:nowrap!important}.bar{height:5px!important;margin:3px 0 3px!important;background:#79c95c!important}.meta{font-size:11px!important;color:#666!important;margin-top:2px!important}.mini-icons{display:flex!important;align-items:center!important;gap:15px!important}.m1-icon{width:16px!important;height:16px!important}.m1-bin{width:15px!important;height:15px!important;color:#222!important}.bin-btn{border:0!important;background:transparent!important;padding:0!important;color:#222!important}.action.evac-action{background:#666c70!important;min-width:70px!important;padding:4px!important;font-size:9px!important;color:#fff!important}.action.evac-action.sent{background:#666c70!important;color:#d71920!important}.action.evac-action.received{background:#666c70!important;color:#d6a900!important}.action.evac-action.confirmed{background:#666c70!important;color:#fff!important}.m1-evac{width:27px!important;height:27px!important;display:block!important;margin:0 auto 3px!important}.reset-e{font-size:29px!important;display:block!important;line-height:1!important}.team-strip-inline{display:grid!important;grid-template-columns:1fr 1fr!important;gap:2px!important;height:60px!important;margin:-2px 0 4px 46px!important}.team-strip-inline button{border:0!important;font-size:14px!important;font-weight:700!important;color:#fff!important}.inline-new{background:#3f4548!important}.inline-existing{background:#82d45b!important}.alarm-panel{margin:0!important}.alarm-panel.flash{background:#df4a36!important;color:#fff!important;min-height:70px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:7px!important}.alarm-panel .alarm-label{font-size:16px!important}.alarm-panel .confirm{background:#697074!important;color:#fff!important;border:0!important;font-size:13px!important;font-weight:700!important;padding:6px 38px!important}.m1-status-text{max-width:150px!important;overflow:hidden!important;text-overflow:ellipsis!important}
-.modal{border-radius:0!important;background:#3b4144!important;border:0!important}.modal h2{font-size:16px!important}.modal .field label{font-size:10px!important}.team-btn{border-radius:0!important}.team-btn.new{background:#7bd23b!important}
-</style>
+  /* Simple simulator wrapper around the replica */
+  .sim-header{
+    height:56px;
+    background:#084b6d;
+    border-bottom:3px solid var(--red);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 30px;
+    font-weight:700;
+    font-size:15px;
+  }
 
-<style id="v21-m1-gospel-fix">
-/* V21: supplied M1 photographs are the visual reference. */
-.m1-status-text{font-size:11px!important;color:#777!important;white-space:nowrap!important}
-.member-row .m1-status-text{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important}
-.evac-action.confirmed{background:#666c70!important;color:#fff!important}
-.evac-action.sent{background:#666c70!important;color:#d71920!important}
-.evac-action.received{background:#666c70!important;color:#d6b900!important}
-.alarm-panel.flash{background:#df4a36!important;color:#fff!important}
+  .sim-header-right{
+    font-size:12px;
+  }
+
+  .stage{
+    min-height:calc(100vh - 56px);
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:28px 12px 30px;
+  }
+
+  .device{
+    width:min(650px,96vw);
+    background:#050505;
+    border:1px solid #1c1f20;
+    border-radius:7px;
+    padding:9px;
+    box-shadow:0 15px 40px rgba(0,0,0,.45);
+  }
+
+  .screen{
+    width:100%;
+    background:#f2f3f3;
+    overflow:hidden;
+  }
+
+  .top{
+    height:142px;
+    background:var(--screen);
+    position:relative;
+    display:flex;
+    align-items:flex-start;
+    padding:21px 34px;
+  }
+
+  .hamburger{
+    width:34px;
+    margin-right:17px;
+    padding-top:5px;
+  }
+
+  .hamburger span{
+    display:block;
+    height:4px;
+    width:28px;
+    background:#fff;
+    margin-bottom:6px;
+  }
+
+  .time{
+    font-size:38px;
+    font-weight:300;
+    line-height:42px;
+    letter-spacing:-1px;
+  }
+
+  .battery{
+    position:absolute;
+    top:26px;
+    right:25px;
+    font-size:14px;
+    font-weight:700;
+  }
+
+  .content{
+    background:#f1f2f2;
+    padding:10px 7px 7px;
+  }
+
+  .slot{
+    height:calc((100vh - 56px - 142px - 55px) / 6);
+    min-height:100px;
+    max-height:145px;
+    margin-bottom:7px;
+    border-radius:11px;
+    background:var(--slot);
+    display:grid;
+    grid-template-columns:76px 1fr;
+    align-items:center;
+    color:#fff;
+  }
+
+  .slot-number{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:31px;
+    font-weight:300;
+  }
+
+  .slot-label{
+    font-size:26px;
+    font-style:italic;
+    font-weight:300;
+    padding-left:9px;
+    white-space:nowrap;
+  }
+
+  .bottom{
+    height:50px;
+    background:#050505;
+  }
+
+  @media(max-width:700px){
+    .sim-header{
+      height:50px;
+      padding:0 16px;
+      font-size:13px;
+    }
+
+    .sim-header-right{display:none}
+
+    .stage{
+      min-height:calc(100vh - 50px);
+      padding:0;
+      align-items:flex-start;
+    }
+
+    .device{
+      width:100%;
+      max-width:650px;
+      border:0;
+      border-radius:0;
+      padding:0;
+      box-shadow:none;
+    }
+
+    .top{
+      height:142px;
+      padding:22px 31px;
+    }
+
+    .time{font-size:37px}
+
+    .content{
+      padding:11px 8px 8px;
+    }
+
+    .slot{
+      height:calc((100vh - 50px - 142px - 55px) / 6);
+      min-height:108px;
+      margin-bottom:8px;
+      border-radius:11px;
+      grid-template-columns:76px 1fr;
+    }
+
+    .slot-number{font-size:31px}
+    .slot-label{font-size:26px}
+  }
 </style>
 </head>
+
 <body>
-<div class="top"><span>ECB TRAINING SIMULATOR</span><button id="openController">OPEN INSTRUCTOR CONTROLLER</button></div>
-<div class="page">
-<section id="boardPage" class="board-wrap">
-<div class="ecb-shell">
-<div class="ecb-title"><span>MSA ENTRY CONTROL BOARD SIMULATOR</span><span id="sessionText"></span></div>
-<div class="screen-frame"><div class="screen">
-<div class="screen-head">
-  <button class="hamb" id="menuBtn" aria-label="Menu">☰</button>
-  <div class="head-identity"><div class="ecp-name">ECP ALPHA</div><div class="ecp-time" id="clock">13:14</div></div>
-  <div class="head-spacer"></div>
-  <div class="head-status"><span class="battery">BAT <b id="battery">100%</b></span></div>
-</div>
-<div class="rows" id="rows"></div>
-<div class="menu" id="menu">
-  <div class="menu-app"><div class="menu-icon">☼</div><div><b>App Mode</b><strong>Light</strong></div></div>
-  <div class="menu-section-title">Time</div>
-  <button id="menuElapsed" class="radio-btn" onclick="setDisplay('elapsed')"><span>○</span> Elapsed Time (MIN)</button>
-  <button id="menuTtw" class="radio-btn" onclick="setDisplay('ttw')"><span>○</span> TTW (Time To Whistle)</button>
-  <button id="menuTow" class="radio-btn" onclick="setDisplay('tow')"><span>◉</span> TOW (Time of Whistle)</button>
-  <button class="menu-line" onclick="showBattery()"><span class="mi">◉</span><span>Pressure Settings</span><b>⌄</b></button>
-  <button class="menu-line" onclick="showStatus()"><span class="mi">⌁</span><span>Connectivity<br><small>MSAHUB15</small></span><b>⌄</b></button>
-  <button class="menu-line"><span class="mi">ⓘ</span><span>About<br><small>Version 1.2.5.4</small></span><b>⌄</b></button>
-  <button class="menu-line"><span class="mi">?</span><span>Help</span><b>⌄</b></button>
-  <button class="menu-big" onclick="openForceLogOn()"><span>♙</span> ADD FIREFIGHTER</button>
-  <button class="menu-big" onclick="addLocation()"><span>●</span> ADD LOCATION</button>
-  <button class="menu-reset" onclick="openReset();closeMenu()">RESET ECB</button>
-  <div class="menu-note">MSA M1-style training simulation.</div>
-</div>
-</div></div>
-<div class="footer-controls m1-hidden-controls"><button onclick="openInsert()">PLACE TALLY</button><button id="evacAllBtn" class="red" onclick="evacuateAll()">EVACUATE ALL</button><button onclick="openReset()">RESET</button></div>
-</div>
-</section>
-<section id="controllerPage" class="controller hidden">
-<h2>MSA ECB INSTRUCTOR CONTROLLER</h2><div class="controller-body"><div class="info">SESSION: <b id="controllerSession"></b><br><span id="syncStatus">● CONNECTED TO ECB SESSION</span><br><br>This controller operates the same ECB session. Open it on another screen with the same session and control each wearer individually.</div><div class="actions"><button class="green" onclick="forceLogNext()">+ FORCE LOG ON</button><button onclick="openReset()">RESET BLANK BOARD</button><button class="red" onclick="evacuateAll()">EVACUATE ALL</button><button onclick="setBattery()">SET ECB BATTERY</button><button onclick="connectionToggle()">TOGGLE ECB CONNECTION</button><button onclick="location.reload()">REFRESH SESSION</button></div><div class="info"><b>INSTRUCTOR ONLY</b> — The ECO does not see this panel. All controls below operate the same live M1 ECB session.</div><div class="actions"><button onclick="receiveEvacAll()">EVAC RECEIVED — ALL</button><button onclick="standbyToggle()">TOGGLE STANDBY</button><button onclick="testAllAlarms()">TEST ALARMS</button><button onclick="clearAllAlarms()">CLEAR ALARMS</button></div><div id="cards"></div></div>
-</section>
-</div>
-<div class="modal-bg" id="modal"><div class="modal"><h2 id="modalTitle">PLACE TALLY</h2><div class="info">Insert the tally, check the pressure is at least 240 bar, then select the team. The ECB uses the next available digital slot.</div><div class="field"><label>WEARER / TALLY SERIAL</label><input id="serial" placeholder="e.g. 640212"></div><div class="field"><label>WEARER NAME</label><input id="name" placeholder="e.g. SMITH"></div><div class="field"><label>STARTING PRESSURE</label><input id="pressure" type="number" min="240" max="300" value="300"></div><div class="field"><label>TIME IN / TIME OF WHISTLE</label><input id="tow" type="time"></div><div class="field"><label>AIR CONSUMPTION (BAR/MIN)</label><input id="rate" type="number" min="1" max="30" step=".5" value="11"></div><div class="modal-actions"><button onclick="closeInsert()">CANCEL</button><button class="green" onclick="submitTally()">INSERT TALLY</button></div></div></div>
-<div class="evac-bg" id="evacBg"><div class="evac-box"><p id="evacQuestion">Are you sure that you want evacuate Team 1?</p><div class="evac-actions"><button onclick="closeEvacConfirm()">CANCEL</button><button class="evac-confirm-button" onclick="confirmEvacSend()">↪ EVACUATE</button></div></div></div><div class="reset-bg" id="resetBg"><div class="reset-box"><h2>RESET ECB</h2><p>This will remove every committed wearer and return all six slots to <b>Slot Available</b>.</p><div class="reset-actions"><button onclick="closeReset()">CANCEL</button><button class="danger" onclick="confirmReset()">RESET BLANK BOARD</button></div></div></div><div class="toast" id="toast"></div>
+  <header class="sim-header">
+    <div>ECB TRAINING SIMULATOR</div>
+    <div class="sim-header-right">ECP-ALPHA</div>
+  </header>
+
+  <main class="stage">
+    <section class="device">
+      <div class="screen">
+
+        <header class="top">
+          <div class="hamburger" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="time" id="clock">07:28</div>
+
+          <div class="battery">43% ▣</div>
+        </header>
+
+        <section class="content">
+          <div class="slot"><div class="slot-number">1</div><div class="slot-label">Slot Available</div></div>
+          <div class="slot"><div class="slot-number">2</div><div class="slot-label">Slot Available</div></div>
+          <div class="slot"><div class="slot-number">3</div><div class="slot-label">Slot Available</div></div>
+          <div class="slot"><div class="slot-number">4</div><div class="slot-label">Slot Available</div></div>
+          <div class="slot"><div class="slot-number">5</div><div class="slot-label">Slot Available</div></div>
+          <div class="slot"><div class="slot-number">6</div><div class="slot-label">Slot Available</div></div>
+        </section>
+
+        <div class="bottom"></div>
+      </div>
+    </section>
+  </main>
+
 <script>
-(function(){
-const p=new URLSearchParams(location.search);const session=p.get('session')||'ECB-ALPHA';const controller=p.get('mode')==='controller';
-const key='MSA_ECB_'+session;const bc=('BroadcastChannel' in window)?new BroadcastChannel(key):null;
-let state={wearers:[],battery:100,connection:'ok',location:'',standby:false,eventLog:[],activeTeam:null},display='tow',selectedSlot=null,forcedLog=false,pendingTeamSlot=null;
-const $=id=>document.getElementById(id);
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function load(){try{const x=localStorage.getItem(key);if(x){const s=JSON.parse(x);if(s&&Array.isArray(s.wearers)){state=s;state.battery=Math.max(0,Math.min(100,Number.isFinite(state.battery)?state.battery:100));state.connection=state.connection||'ok';state.location=state.location||'';state.standby=!!state.standby;state.eventLog=Array.isArray(state.eventLog)?state.eventLog:[]}}}catch(e){}}
-function save(){try{localStorage.setItem(key,JSON.stringify(state))}catch(e){}if(bc){try{bc.postMessage(state)}catch(e){}}render()}
-if(bc)bc.onmessage=e=>{if(e.data&&e.data.__reset){state={wearers:[],battery:100,connection:'ok',location:'',standby:false,eventLog:[]};render();return}if(e.data&&Array.isArray(e.data.wearers)){state=e.data;render()}};window.addEventListener('storage',e=>{if(e.key===key){if(e.newValue){try{state=JSON.parse(e.newValue);render()}catch(x){}}else{state={wearers:[],battery:100,connection:'ok',location:'',standby:false,eventLog:[]};render()}}});load();
-$('sessionText').textContent=session;$('controllerSession').textContent=session;
-function toast(t){const x=$('toast');x.textContent=t;x.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.style.display='none',1900)}
-function wearer(slot){return state.wearers.find(w=>w.slot===slot)}
-function nextFree(){for(let i=1;i<=6;i++)if(!wearer(i))return i;return null}
-function teamNum(t){const m=String(t||'').match(/(\d+)$/);return m?+m[1]:99}
-function teamName(n){return 'ALPHA '+n}
-function teams(){return [...new Set(state.wearers.map(w=>w.team).filter(Boolean))].sort((a,b)=>teamNum(a)-teamNum(b))}
-function nextTeam(){for(let i=1;i<=10;i++)if(!teams().some(t=>teamNum(t)===i))return i;return null}
-function mins(w){return w.consumption>0?w.pressure/w.consumption:999}
-function elapsed(w){return(Date.now()-w.started)/60000}
-function mm(v){let s=Math.max(0,Math.round(v*60));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-function ttwWarn(w){return mins(w)<10&&mins(w)>0}
-function lowPressure(w){return w.pressure<=100 && w.pressure>0}
-function activeAlarm(w){
-  return (w.dsu&&!w.dsuAck)||(w.adsu&&!w.adsuAck)||(w.withdrawal&&!w.withdrawalAck)||(!w.lowAck&&lowPressure(w));
-}
-function hasAlarm(w){return !!(w.dsu||w.adsu||w.withdrawal||lowPressure(w));}
-function pendingAlarmType(w){
-  if(w.dsu&&!w.dsuAck)return 'dsu';
-  if(w.adsu&&!w.adsuAck)return 'adsu';
-  if(w.withdrawal&&!w.withdrawalAck)return 'withdrawal';
-  if(!w.lowAck&&lowPressure(w))return 'low';
-  return null;
-}
-function alarmLabel(w){
-  if(w.dsu&&!w.dsuAck)return 'MANUAL ALARM';
-  if(w.adsu&&!w.adsuAck)return 'MOTION ALARM';
-  if(w.withdrawal&&!w.withdrawalAck)return 'WITHDRAWAL';
-  if(!w.lowAck&&lowPressure(w))return 'LOW PRESSURE';
-  return '';
-}
-function alarmConfirmedLabel(w){
-  if(w.dsu&&w.dsuAck)return 'MANUAL ALARM — CONFIRMED';
-  if(w.adsu&&w.adsuAck)return 'MOTION ALARM — CONFIRMED';
-  if(w.withdrawal&&w.withdrawalAck)return 'WITHDRAWAL — CONFIRMED';
-  if(w.lowAck&&lowPressure(w))return 'LOW PRESSURE — CONFIRMED';
-  return '';
-}
-function initialiseWearer(w){
-  w.telemetry=w.telemetry||'ok'; w.dsu=!!w.dsu; w.adsu=!!w.adsu; w.withdrawal=!!w.withdrawal;
-  w.dsuAck=!!w.dsuAck; w.adsuAck=!!w.adsuAck; w.withdrawalAck=!!w.withdrawalAck; w.lowAck=!!w.lowAck;
-  w.evac=!!w.evac; w.evacStage=Number(w.evacStage||0); w.evacSentAt=Number(w.evacSentAt||0); w.evacReceivedAt=Number(w.evacReceivedAt||0); w.wearerEvac=!!w.wearerEvac; w.wearerEvacAt=Number(w.wearerEvacAt||0);
-  w.pressure=Number.isFinite(Number(w.pressure))?Number(w.pressure):300;
-  w.consumption=Math.max(1,Number(w.consumption)||11);
-  w.started=Number(w.started)||Date.now(); w.last=Number(w.last)||Date.now();
-}
-state.wearers.forEach(initialiseWearer);
-
-window.openInsert=function(){
-   if(state.standby){toast('WAKE THE ECB FROM STANDBY FIRST');return}
-   if(pendingTeamSlot!=null){toast('SELECT A TEAM FOR THE PENDING TALLY FIRST');return}
-   selectedSlot=nextFree();
-   if(!selectedSlot){toast('All six digital slots are occupied');return}
-   forcedLog=false; prepareModal('PLACE TALLY'); $('modal').classList.add('open');
- };
- window.openForceLogOn=function(){
-   if(state.standby){toast('WAKE THE ECB FROM STANDBY FIRST');return}
-   selectedSlot=nextFree();
-   if(!selectedSlot){toast('All six digital slots are occupied');return}
-   forcedLog=true; prepareModal('FORCE LOG ON'); $('modal').classList.add('open'); closeMenu();
- };
- function prepareModal(title){
-  $('modalTitle').textContent=title; $('serial').value=''; $('name').value=''; $('pressure').value=300;
-  $('tow').value=new Date().toTimeString().slice(0,5); $('rate').value=11;
-}
-window.closeInsert=function(){$('modal').classList.remove('open');selectedSlot=null;forcedLog=false};
-function renderTeamChoices(){
-   let out='';
-   teams().forEach(t=>out+=`<button class="team-btn" onclick="assignPendingTeam('${esc(t)}')"><span>${esc(t)}</span></button>`);
-   const n=nextTeam();
-   if(n)out+=`<button class="team-btn new" onclick="assignPendingTeam('${teamName(n)}')"><span>${teamName(n)}</span></button>`;
-   if(!out)out=`<button class="team-btn new" onclick="assignPendingTeam('ALPHA 1')"><span>ALPHA 1</span></button>`;
-   const target=$('teamChoices');
-   if(target) target.innerHTML=out;
-   return out;
- }
- window.submitTally=()=>commit(null);
- window.commitExisting=t=>assignPendingTeam(t); window.commitNew=n=>assignPendingTeam(teamName(n));
- function commit(team){
-   if(!selectedSlot)return;
-   const pr=Math.max(240,Math.min(300,Number($('pressure').value)||300));
-   const now=Date.now();
-   // M1 behaviour shown in the supplied registering video: once a team exists,
-   // another tally is added into that team's existing slot rather than opening
-   // a new ECB position.
-   let targetSlot=selectedSlot;
-   if(state.activeTeam){
-     const existing=state.wearers.find(w=>w.team===state.activeTeam);
-     if(existing) targetSlot=existing.slot;
-   }
-   const memberCount=state.wearers.filter(w=>w.slot===targetSlot).length;
-   state.wearers.push({slot:targetSlot,member:memberCount+1,name:'',serial:$('serial').value.trim()||String(600000+state.wearers.length+1),team:state.activeTeam||null,pressure:pr,consumption:Math.max(1,Number($('rate').value)||11),tow:$('tow').value||new Date().toTimeString().slice(0,5),started:now,last:now});
-   pendingTeamSlot=state.activeTeam?null:targetSlot;
-   const s2=targetSlot; closeInsert(); save();
-   logEvent((forcedLog?'Force logged ':'Tally placed ')+'in slot '+s2+(state.activeTeam?' / '+state.activeTeam:''));
-   toast(state.activeTeam?'TALLY ADDED TO '+state.activeTeam:'SELECT TEAM ON ECB');
- }
- window.assignPendingTeam=function(team){
-   if(pendingTeamSlot==null)return;
-   const slot=pendingTeamSlot;
-   const members=state.wearers.filter(w=>w.slot===slot);
-   if(!members.length){pendingTeamSlot=null;render();return}
-   members.forEach(w=>w.team=team);
-   state.activeTeam=team;
-   pendingTeamSlot=null;
-   save(); toast(team+' ASSIGNED');
- };
- 
-window.startNewTeamFromSlot=function(slot){
-  const w=state.wearers.find(x=>x.slot===slot); if(!w)return;
-  const n=nextTeam();
-  state.activeTeam=teamName(n||1);
-  pendingTeamSlot=slot;
-  render();
-};
-window.setDisplay=v=>{display=v;closeMenu();render()};
-function closeMenu(){$('menu').classList.remove('open')}; window.closeMenu=closeMenu; $('menuBtn').onclick=()=>$('menu').classList.toggle('open');
-window.addLocation=()=>{closeMenu();const location=prompt('Enter incident/location reference:',state.location||'');if(location!==null){state.location=location;save();toast('Location updated')}};
-window.showBattery=()=>{closeMenu();toast('ECB battery: '+Math.round(state.battery)+'%')};
-window.showStatus=()=>{closeMenu();toast('Power ON · Network CONNECTED · Telemetry active')};
-
-function renderEmptySlot(slot){return `<div class="row empty-slot" data-slot="${slot}" onclick="openInsert()"><div class="num">${slot}</div><div class="content place"><span>Slot Available</span></div></div>`}
-
-function iconTelemetry(kind){
-  if(kind==='ok') return '<svg class="m1-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 0 1 16 0M7 13a5 5 0 0 1 10 0M10 16a2 2 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-  if(kind==='lost') return '<svg class="m1-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 0 1 16 0M8 13a4 4 0 0 1 8 0M3 3l18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-  return '<svg class="m1-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-}
-function iconBin(){return '<svg class="m1-bin" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8m-7 3v8m6-8v8M6 7l1 14h10l1-14M5 7h14M9 4h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
-function iconEvac(){return '<svg class="m1-evac" viewBox="0 0 32 32" aria-hidden="true"><path d="M19 5h8v22h-8M19 16H7m0 0 5-5m-5 5 5 5M15 6l-3 4m-1 10 3 4" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
-
-function renderBoard(){
-  let out=''; const teamList=teams();
-  for(let i=1;i<=6;i++){
-    const members=state.wearers.filter(w=>w.slot===i);
-    if(!members.length){out+=renderEmptySlot(i);continue}
-    members.forEach(initialiseWearer);
-    const lead=members[0];
-    let groupEvacStage=Number(lead.evacStage||0);
-    let groupWearerEvac=members.some(w=>w.wearerEvac&&w.evacStage===1);
-    // Evacuation is a team/wearer state on the M1 display, not a generic alarm banner.
-    // Generic alarm panels are reserved for DSU/ADSU/pressure/withdrawal conditions.
-    let alarmMember=members.find(w=>activeAlarm(w) && !w.evac);
-    let alarmPanel='';
-    if(alarmMember){const p=pendingAlarmType(alarmMember);alarmPanel=`<div class="alarm-panel flash"><span class="alarm-label">${alarmLabel(alarmMember)}</span><button class="confirm" onclick="ack(${i},'${p}');event.stopPropagation()">CONFIRM</button></div>`;}
-    let evacClass=''; let evacText=''; let evacHandler=`openTeamEvacConfirm(${i})`; let evacTitle='SEND EVACUATION';
-    if(groupEvacStage===1){evacClass='sent';evacText='SENT'}
-    else if(groupEvacStage===2){evacClass='received';evacText='RECEIVED';evacHandler=`confirmTeamEvacDouble(${i})`;evacTitle='DOUBLE PRESS TO CONFIRM'}
-    else if(groupEvacStage===3){evacClass='confirmed';evacText='CONFIRMED';evacHandler=`resetTeamEvac(${i})`;evacTitle='RESET EVACUATION'}
-    const evacStatus=groupEvacStage===1?'Evacuation Sent':groupEvacStage===2?'Evacuation Received':groupEvacStage===3?'Evacuation Confirmed':'';
-    const groupAlarm=alarmPanel;
-    out+=`<div class="team-group" data-slot="${i}">`;
-    out+=`<div class="team-main"><div class="team-num committed" style="grid-row:1 / span ${members.length}">${i}</div><div class="team-members">`;
-    members.forEach((w,mi)=>{
-      const value=display==='tow'?w.tow:display==='ttw'?mm(mins(w)):mm(elapsed(w));
-      const low=lowPressure(w); const bar=low?'red':w.pressure<160?'amber':'';
-      const status=groupEvacStage===3?'Evacuation Confirmed':groupEvacStage===2?'Evacuation Received':groupEvacStage===1?'Evacuation Sent':(low?'Pressure Warning':'');
-      const tele=iconTelemetry(w.telemetry);
-      out+=`<div class="member-row ${low?'member-low':''}"><div class="pressure-line"><span class="pressure">${Math.round(w.pressure)}<small>bar</small></span><span class="m1-status-text">${status}</span></div><div class="bar ${bar}" style="width:${Math.max(2,Math.min(100,w.pressure/3))}%"></div><div class="meta"><span>${display==='tow'?'TOW':display==='ttw'?'TTW':'TTW'}: ${esc(value)}</span><span class="mini-icons">${tele}<button aria-label="Force log off wearer" title="Force log off wearer" class="bin-btn" onclick="removeMember(${i},${mi});event.stopPropagation()">${iconBin()}</button></span></div></div>`;
-    });
-    if(groupAlarm)out+=groupAlarm;
-    out+=`</div><button title="${evacTitle}" class="action evac-action ${evacClass}" onclick="${evacHandler};event.stopPropagation()">${groupEvacStage===3?'<span class="reset-e">↻</span>':iconEvac()}<b>${groupEvacStage===3?'RESET EVACUATION':(evacText||'EVACUATE')}</b></button></div>`;
-    if(pendingTeamSlot===i){
-      const existing=teams().filter(t=>t!==lead.team);
-      out+=`<div class="team-strip-inline" data-team-for="${i}"><button class="inline-new" onclick="assignPendingTeam('${teamName(nextTeam()||1)}')">NEW TEAM</button>${teams().map(t=>`<button class="inline-existing" onclick="assignPendingTeam('${esc(t)}')">${esc(t)}</button>`).join('')}</div>`;
-    }
-    out+=`</div>`;
-  }
-  $('rows').innerHTML=out;
-  $('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
-  $('battery').textContent=Math.round(state.battery)+'%'; $('battery').style.color=state.battery<20?'#ed1c24':state.battery<40?'#d6a900':'#fff';
-  $('evacAllBtn').style.display=teamList.length>1?'block':'none';
-  $('menuTow').classList.toggle('active',display==='tow'); $('menuTtw').classList.toggle('active',display==='ttw'); $('menuElapsed').classList.toggle('active',display==='elapsed');
-}
-window.ack=(slot,k)=>{const w=wearer(slot);if(!w)return;if(k==='dsu')w.dsuAck=true;if(k==='adsu')w.adsuAck=true;if(k==='withdrawal')w.withdrawalAck=true;if(k==='low')w.lowAck=true;logEvent((k==='low'?'LOW PRESSURE':k==='adsu'?'MOTION / ADSU':k==='dsu'?'MANUAL / DSU':'WITHDRAWAL')+' acknowledged by ECO on slot '+slot);save();toast((k==='low'?'LOW PRESSURE':k==='adsu'?'MOTION / ADSU':k==='dsu'?'MANUAL / DSU':'WITHDRAWAL')+' acknowledged by ECO')};
-window.teamMembers=slot=>state.wearers.filter(w=>w.slot===slot);
-window.sendTeamEvac=slot=>{const ms=teamMembers(slot);if(!ms.length)return;ms.forEach(w=>{w.evac=true;w.wearerEvac=false;w.evacStage=1;w.evacSentAt=Date.now();w.evacReceivedAt=0});save();toast('EVACUATION SIGNAL SENT — '+(ms[0].team||('TEAM '+slot)))};
-window.sendWearerEvacMember=(slot,mi)=>{const ms=teamMembers(slot),w=ms[mi];if(!w)return;ms.forEach(x=>{x.evac=true;x.evacStage=1;x.evacSentAt=Date.now();x.evacReceivedAt=0});w.wearerEvac=true;w.wearerEvacAt=Date.now();save();toast('WEARER EVAC SIGNAL — SLOT '+slot)};
-window.receiveTeamEvac=slot=>{const ms=teamMembers(slot);if(!ms.length)return;ms.forEach(w=>{if(w.evac){w.evacStage=2;w.evacReceivedAt=Date.now();w.wearerEvac=false}});save();toast('EVACUATION RECEIVED — TEAM '+slot)};
-window.confirmTeamEvacDouble=slot=>{const ms=teamMembers(slot);if(!ms.length||ms[0].evacStage!==2){toast('EVACUATION MUST BE RECEIVED BEFORE CONFIRM');return}const now=Date.now();if(!evacPress[slot]||now-evacPress[slot]>900){evacPress[slot]=now;toast('PRESS EVACUATE AGAIN TO CONFIRM');return}delete evacPress[slot];ms.forEach(w=>w.evacStage=3);save();toast('EVACUATION CONFIRMED — TEAM '+slot)};
-window.openTeamEvacConfirm=slot=>{const ms=teamMembers(slot);if(!ms.length)return;pendingEvacSlot=slot;$('evacQuestion').textContent=`Are you sure that you want evacuate ${ms[0].team||('Team '+slot)}?`;$('evacBg').classList.add('open')};
-window.confirmTeamEvacSend=()=>{if(pendingEvacSlot==null)return;const slot=pendingEvacSlot;closeEvacConfirm();sendTeamEvac(slot)};
-window.resetTeamEvac=slot=>{const ms=teamMembers(slot);if(!ms.length)return;ms.forEach(w=>{w.evac=false;w.evacStage=0;w.evacSentAt=0;w.evacReceivedAt=0;w.wearerEvac=false;w.wearerEvacAt=0});save();toast('EVACUATION RESET — TEAM '+slot)};
-window.removeMember=(slot,mi)=>{const ms=teamMembers(slot),w=ms[mi];if(!w)return;if(confirm('Force log off this wearer?')){state.wearers=state.wearers.filter(x=>x!==w);if(!state.wearers.some(x=>x.slot===slot))state.activeTeam=null;save();toast('FORCE LOG OFF — WEARER REMOVED')}};
-window.sendEvac=slot=>{
-  const w=wearer(slot); if(!w)return; if(state.wearers.filter(x=>x.slot===slot).length>1){sendTeamEvac(slot);return;}
-  w.evac=true; w.wearerEvac=false; w.evacStage=1; w.evacSentAt=Date.now(); w.evacReceivedAt=0;
-  logEvent('ECO evacuation signal sent to slot '+slot);
-  save(); toast('EVACUATION SIGNAL SENT TO SLOT '+slot);
-};
-window.sendWearerEvac=slot=>{
-  const w=wearer(slot); if(!w)return;
-  w.evac=true; w.wearerEvac=true; w.wearerEvacAt=Date.now(); w.evacStage=1; w.evacSentAt=Date.now(); w.evacReceivedAt=0;
-  logEvent('Instructor simulated BA wearer evacuation signal from slot '+slot);
-  save(); toast('WEARER EVAC SIGNAL — SLOT '+slot);
-};
-window.confirmEvac=slot=>{const w=wearer(slot);if(!w||!w.evac)return;if(w.evacStage!==2){toast('EVACUATION NOT YET RECEIVED');return}w.evacStage=3;logEvent('Evacuation confirmed by ECO for slot '+slot);save();toast('Evacuation confirmed for slot '+slot)};
-let evacPress={}; window.confirmEvacDouble=slot=>{const w=wearer(slot);if(!w||!w.evac)return;if(w.evacStage!==2){toast('EVACUATION MUST BE RECEIVED BEFORE CONFIRM');return}const now=Date.now();if(!evacPress[slot]||now-evacPress[slot]>900){evacPress[slot]=now;toast('PRESS EVACUATE AGAIN TO CONFIRM');return}delete evacPress[slot];confirmEvac(slot)};
-window.evacuateAll=()=>{if(teams().length<2){toast('EVACUATE ALL appears once more than one team is committed');return}state.wearers.forEach(w=>{w.evac=true;w.evacStage=1;w.evacSentAt=Date.now();w.evacReceivedAt=0});save();toast('EVACUATE ALL sent')};
-window.receiveEvac=slot=>{const w=wearer(slot);if(!w||!w.evac)return;w.evacStage=2;w.evacReceivedAt=Date.now();w.wearerEvac=false;logEvent('Evacuation signal received by slot '+slot);save();toast('EVACUATION RECEIVED — SLOT '+slot)};
-window.receiveEvacAll=()=>{state.wearers.forEach(w=>{if(w.evac&&w.evacStage===1){w.evacStage=2;w.evacReceivedAt=Date.now()}});save();toast('Evacuation received by all affected wearers')};
-let pendingEvacSlot=null;
-window.openEvacConfirm=slot=>{const w=wearer(slot);if(!w)return;pendingEvacSlot=slot;$('evacQuestion').textContent=`Are you sure that you want evacuate ${w.team||('Team '+slot)}?`;$('evacBg').classList.add('open')};
-window.closeEvacConfirm=()=>{$('evacBg').classList.remove('open');pendingEvacSlot=null};
-window.confirmEvacSend=()=>{if(pendingEvacSlot==null)return;const slot=pendingEvacSlot;closeEvacConfirm();sendTeamEvac(slot)};
-window.resetEvac=slot=>{const w=wearer(slot);if(!w)return;w.evac=false;w.evacStage=0;w.evacSentAt=0;w.evacReceivedAt=0;w.wearerEvac=false;w.wearerEvacAt=0;logEvent('Evacuation reset for '+w.team+' slot '+slot);save();toast('EVACUATION RESET')};
-window.openReset=()=>{$('resetBg').classList.add('open')}; window.closeReset=()=>{$('resetBg').classList.remove('open')};
-window.confirmReset=()=>{const blank={wearers:[],battery:100,connection:'ok',location:'',standby:false,eventLog:[],activeTeam:null};pendingTeamSlot=null;state=blank;try{localStorage.setItem(key,JSON.stringify(blank))}catch(e){}if(bc){try{bc.postMessage({__reset:true,state:blank});bc.postMessage(blank)}catch(e){}}closeReset();render();toast('ECB RESET — BLANK BOARD')}; window.resetBoard=window.openReset;
-window.setBattery=()=>{const x=prompt('ECB battery percentage (0-100)',String(state.battery));if(x!==null){state.battery=Math.max(0,Math.min(100,Number(x)||0));save()}};
-window.updateField=(slot,key,val)=>{const w=wearer(slot);if(!w)return;if(key==='pressure')w.pressure=Math.max(0,Math.min(300,Number(val)||0));else if(key==='consumption')w.consumption=Math.max(1,Number(val)||1);else w[key]=val;save()};
-window.toggle=(slot,key)=>{const w=wearer(slot);if(!w)return;w[key]=!w[key];if(key==='dsu'&&w.dsu)w.dsuAck=false;if(key==='adsu'&&w.adsu)w.adsuAck=false;if(key==='withdrawal'&&w.withdrawal)w.withdrawalAck=false;save()};
-window.lowPressureTest=slot=>{const w=wearer(slot);if(!w)return;w.pressure=100;w.lowAck=false;save();toast('Low-pressure condition simulated')};
-window.telemetry=slot=>{const w=wearer(slot);if(!w)return;w.telemetry=w.telemetry==='ok'?'lost':w.telemetry==='lost'?'off':'ok';save()};
-window.connectionToggle=()=>{state.connection=state.connection==='ok'?'lost':state.connection==='lost'?'reconnecting':'ok';save();toast('ECB connection: '+state.connection.toUpperCase())};
-window.dunkOff=slot=>{const w=wearer(slot);if(!w)return;state.wearers=state.wearers.filter(x=>x.slot!==slot);logEvent('Tally dunked back into ECB — slot '+slot+' logged off');save();toast('TALLY DUNK — WEARER REMOVED')};
-window.forceLogOff=slot=>{const w=wearer(slot);if(!w)return;if(confirm('Force log off this wearer?')){state.wearers=state.wearers.filter(x=>x.slot!==slot);logEvent('Instructor force logged off slot '+slot);save();toast('FORCE LOG OFF — SLOT '+slot)}};
-window.removeTally=slot=>{const w=wearer(slot);if(!w)return;if(confirm('Force log off this wearer from the ECB?')){state.wearers=state.wearers.filter(x=>x.slot!==slot);pendingTeamSlot=null;logEvent('Force logged off via ECB bin — slot '+slot);save();toast('FORCE LOG OFF — SLOT '+slot)}};
-
-window.forceLogSlot=slot=>{if(wearer(slot)){toast('Slot already occupied');return}selectedSlot=slot;forcedLog=true;prepareModal('FORCE LOG ON — SLOT '+slot);renderTeamChoices();$('modal').classList.add('open')};
-window.forceLogNext=()=>{selectedSlot=nextFree();if(!selectedSlot){toast('All six digital slots are occupied');return}forcedLog=true;prepareModal('FORCE LOG ON');renderTeamChoices();$('modal').classList.add('open')};
-function logEvent(text){state.eventLog=Array.isArray(state.eventLog)?state.eventLog:[];state.eventLog.unshift({time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}),text});state.eventLog=state.eventLog.slice(0,40)}
-window.standbyToggle=()=>{state.standby=!state.standby;logEvent(state.standby?'ECB placed into standby':'ECB awakened from standby');save();toast(state.standby?'ECB STANDBY':'ECB AWAKE')};
-window.testAllAlarms=()=>{if(!state.wearers.length){toast('No wearers available for alarm test');return}const w=state.wearers[0];w.dsu=true;w.dsuAck=false;logEvent('Test: DSU/manual alarm on slot '+w.slot);save();toast('DSU test alarm triggered on slot '+w.slot)};
-window.clearAllAlarms=()=>{state.wearers.forEach(w=>{w.dsu=false;w.adsu=false;w.withdrawal=false;w.dsuAck=false;w.adsuAck=false;w.withdrawalAck=false;w.lowAck=true});logEvent('Instructor cleared simulated alarms');save();toast('SIMULATED ALARMS CLEARED')};
-function renderController(){
-  let out='';
-  const groups=[...new Set(state.wearers.map(w=>w.slot))].sort((a,b)=>a-b);
-  for(const slot of groups){
-    const ms=teamMembers(slot); const team=ms[0].team||'UNASSIGNED';
-    out+=`<div class="card"><div class="card-head"><span>SLOT ${slot} · ${esc(team)} · ${ms.length} WEARER${ms.length===1?'':'S'}</span><span class="badge">TEAM CONTROL</span></div>`;
-    ms.forEach((w,mi)=>{initialiseWearer(w);const alarm=alarmLabel(w)||alarmConfirmedLabel(w);const evacClass=w.evacStage===1?'red':w.evacStage===2?'yellow':w.evacStage===3?'green':'';
-      out+=`<div class="member-controller"><div class="card-head"><span>WEARER ${mi+1} · SLOT ${slot}</span><span class="badge">${w.telemetry.toUpperCase()}</span></div><div class="grid"><div><label>WEARER</label><input value="${esc(w.name)}" onchange="updateMember(${slot},${mi},'name',this.value)"></div><div><label>TEAM</label><select onchange="updateMember(${slot},${mi},'team',this.value)">${Array.from({length:10},(_,n)=>teamName(n+1)).map(t=>`<option ${t===w.team?'selected':''}>${t}</option>`).join('')}</select></div><div><label>PRESSURE</label><input type="number" min="0" max="300" value="${Math.round(w.pressure)}" onchange="updateMember(${slot},${mi},'pressure',this.value)"></div><div><label>AIR CONSUMPTION BAR/MIN</label><input type="number" min="1" max="30" step=".5" value="${w.consumption}" onchange="updateMember(${slot},${mi},'consumption',this.value)"></div></div><div class="meta"><span>TTW <b>${mm(mins(w))}</b></span><span>ELAPSED <b>${mm(elapsed(w))}</b></span><span>TOW <b>${esc(w.tow)}</b></span></div>${alarm?`<div class="controller-alarm ${activeAlarm(w)?'flash':''}">${alarm}</div>`:''}${w.evac?`<div class="controller-evac ${evacClass}">EVACUATION: ${w.evacStage===1?'SENT':w.evacStage===2?'RECEIVED':'CONFIRMED'}</div>`:''}<div class="controller-section-title">INDIVIDUAL WEARER EVENTS</div><div class="controller-card-grid"><button class="${w.dsu?'active-red':''}" onclick="toggleMember(${slot},${mi},'dsu')">DSU / MANUAL</button><button class="${w.adsu?'active-red':''}" onclick="toggleMember(${slot},${mi},'adsu')">ADSU / MOTION</button><button class="${w.withdrawal?'active-red':''}" onclick="toggleMember(${slot},${mi},'withdrawal')">WITHDRAWAL</button><button onclick="lowPressureMember(${slot},${mi})">LOW PRESSURE</button><button class="wearer-evac" onclick="sendWearerEvacMember(${slot},${mi})">BA WEARER EVAC</button><button onclick="telemetryMember(${slot},${mi})">TELEMETRY</button><button onclick="removeMember(${slot},${mi})">BIN / REMOVE</button><button onclick="dunkMember(${slot},${mi})">DUNK TALLY OFF</button><button onclick="forceLogOffMember(${slot},${mi})">FORCE LOG OFF</button></div></div>`;
-    });
-    out+=`<div class="controller-section-title">TEAM EVACUATION</div><div class="controller-card-grid"><button onclick="sendTeamEvac(${slot})">ECO EVACUATE TEAM</button><button onclick="receiveTeamEvac(${slot})">EVAC RECEIVED</button><button onclick="confirmTeamEvacDouble(${slot})">CONFIRM EVAC</button><button onclick="resetTeamEvac(${slot})">RESET EVACUATION</button></div></div>`;
-  }
-  for(let slot=1;slot<=6;slot++){if(!state.wearers.some(w=>w.slot===slot)) out+=`<div class="card empty-controller-card"><div class="card-head"><span>SLOT ${slot} · AVAILABLE</span><span class="badge">EMPTY</span></div><div class="controller-section-title">INSTRUCTOR ACTION</div><button class="force-btn" onclick="forceLogSlot(${slot})">FORCE LOG ON SLOT ${slot}</button></div>`;}
-  $('cards').innerHTML=out||'<div class="info">No available slots. All six wearer positions are occupied.</div>';
-  if(Array.isArray(state.eventLog)&&state.eventLog.length)$('cards').insertAdjacentHTML('beforeend',`<div class="card"><div class="card-head"><span>INSTRUCTOR EVENT LOG</span><span class="badge">${state.eventLog.length}</span></div><div class="event-log">${state.eventLog.slice(0,12).map(e=>`<div><b>${esc(e.time)}</b> — ${esc(e.text)}</div>`).join('')}</div></div>`);
-}
-window.updateMember=(slot,mi,key,val)=>{const w=teamMembers(slot)[mi];if(!w)return;if(key==='pressure')w.pressure=Math.max(0,Math.min(300,Number(val)||0));else if(key==='consumption')w.consumption=Math.max(1,Number(val)||1);else {w[key]=val;if(key==='team'){state.activeTeam=val;teamMembers(slot).forEach(x=>x.team=val)}}save()};
-window.toggleMember=(slot,mi,key)=>{const w=teamMembers(slot)[mi];if(!w)return;w[key]=!w[key];if(key==='dsu'&&w.dsu)w.dsuAck=false;if(key==='adsu'&&w.adsu)w.adsuAck=false;if(key==='withdrawal'&&w.withdrawal)w.withdrawalAck=false;save()};
-window.lowPressureMember=(slot,mi)=>{const w=teamMembers(slot)[mi];if(!w)return;w.pressure=100;w.lowAck=false;save();toast('Low-pressure condition simulated')};
-window.telemetryMember=(slot,mi)=>{const w=teamMembers(slot)[mi];if(!w)return;w.telemetry=w.telemetry==='ok'?'lost':w.telemetry==='lost'?'off':'ok';save()};
-window.dunkMember=(slot,mi)=>{const w=teamMembers(slot)[mi];if(!w)return;state.wearers=state.wearers.filter(x=>x!==w);save();toast('TALLY DUNK — WEARER REMOVED')};
-window.forceLogOffMember=(slot,mi)=>{const w=teamMembers(slot)[mi];if(!w)return;if(confirm('Force log off this wearer?')){state.wearers=state.wearers.filter(x=>x!==w);save();toast('FORCE LOG OFF — WEARER REMOVED')}};
-
-function render(){if(controller){$('boardPage').classList.add('hidden');$('controllerPage').classList.remove('hidden');renderController()}else{$('boardPage').classList.remove('hidden');$('controllerPage').classList.add('hidden');if(state.standby){$('rows').innerHTML='';$('clock').textContent='';$('battery').textContent=Math.round(state.battery)+'%';$('evacAllBtn').style.display='none'}else{renderBoard()}}}
-if(controller){$('openController').textContent='ECB BOARD';$('openController').onclick=()=>window.open(location.pathname+'?session='+encodeURIComponent(session),'_blank')}else{$('openController').onclick=()=>window.open(location.pathname+'?session='+encodeURIComponent(session)+'&mode=controller','_blank')}
-setInterval(()=>{
-  const now=Date.now(); let changed=false;
-  for(const w of state.wearers){
-    initialiseWearer(w);
-    const dt=(now-w.last)/60000;
-    if(w.pressure>0&&dt>0){const old=w.pressure;w.pressure=Math.max(0,w.pressure-w.consumption*dt);w.last=now;if(Math.round(old)!==Math.round(w.pressure))changed=true}
-    if(w.evac&&w.evacStage===1 && !w.wearerEvac && now-w.evacSentAt>4000){w.evacStage=2;w.evacReceivedAt=now;changed=true}
-    const group=state.wearers.filter(x=>x.slot===w.slot); if(group.length>1){const stage=Math.max(...group.map(x=>Number(x.evacStage||0))); group.forEach(x=>{if(x.evac&&x.evacStage!==stage){x.evacStage=stage;changed=true}})}
-  }
-  if(state.wearers.length&&state.battery>0){state.battery=Math.max(0,state.battery-0.055);changed=true}
-  if(changed){try{localStorage.setItem(key,JSON.stringify(state));if(bc)bc.postMessage(state)}catch(e){}}
-  render();
-},1000);
-render();
-})();
+  // Keep the visual starting state fixed to the supplied reference.
+  // The functionality will be added only after this baseline is approved.
+  document.getElementById("clock").textContent = "07:28";
 </script>
-
-<style>
-@media (max-width:900px){
-  .screen{left:4% !important;top:10% !important;width:92% !important;height:72% !important}
-}
-@media (max-width:600px){
-  .screen{left:2% !important;width:96% !important}
-  .slot{grid-template-columns:30px 1fr 62px !important}
-  .pressure{font-size:20px !important}
-}
-
-/* V10.1 — MSA M1 EMPTY BOARD VISUAL MATCH */
-.screen{
-  background:#c9cccd !important;
-  border:5px solid #080a0b !important;
-  border-radius:2px !important;
-  overflow:hidden !important;
-}
-.screen-head{
-  height:43px !important;
-  min-height:43px !important;
-  background:#353b3e !important;
-  padding:0 8px !important;
-  gap:7px !important;
-  font-size:11px !important;
-}
-.screen-head .hamb{
-  font-size:18px !important;
-}
-.screen-head .grow{
-  font-size:10px !important;
-  line-height:1.05 !important;
-}
-.screen-head .mode{
-  font-size:9px !important;
-}
-.screen-head .conn{
-  font-size:9px !important;
-}
-.screen-head .battery{
-  font-size:9px !important;
-}
-.rows{
-  padding:2px !important;
-  background:#c9cccd !important;
-}
-.row.empty-slot{
-  height:33px !important;
-  min-height:33px !important;
-  margin:0 0 2px 0 !important;
-  grid-template-columns:28px 1fr !important;
-  border:1px solid #f1f1f1 !important;
-  background:#7a8083 !important;
-  cursor:pointer !important;
-}
-.row.empty-slot:last-child{
-  margin-bottom:0 !important;
-}
-.empty-slot .num{
-  height:31px !important;
-  background:#747a7d !important;
-  color:#f5f5f5 !important;
-  font-size:12px !important;
-  font-weight:700 !important;
-  border-right:1px solid #929799 !important;
-}
-.empty-slot .content.place{
-  height:31px !important;
-  min-height:31px !important;
-  padding:0 8px !important;
-  justify-content:flex-start !important;
-  background:#7a8083 !important;
-  color:#f4f4f4 !important;
-  font-size:10px !important;
-  font-style:normal !important;
-  font-weight:700 !important;
-  letter-spacing:-.15px !important;
-}
-.empty-slot .content.place span{
-  display:block !important;
-}
-.row.empty-slot:hover{
-  filter:none !important;
-  background:#7a8083 !important;
-}
-
-</style>
-
-
-<style>
-@media(min-width:651px){
-  .screen-frame{max-width:430px !important;}
-}
-</style>
-
-
-<style id="v12-slot-fill">
-/* V12 — six M1 display positions fill the complete display area. */
-.screen{
-  height:820px !important;
-  min-height:820px !important;
-}
-.screen-head{
-  height:43px !important;
-  min-height:43px !important;
-}
-.rows{
-  height:calc(100% - 43px) !important;
-  min-height:0 !important;
-  padding:2px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:2px !important;
-}
-.row{
-  flex:1 1 0 !important;
-  height:auto !important;
-  min-height:0 !important;
-  margin:0 !important;
-}
-.row.empty-slot{
-  flex:1 1 0 !important;
-  height:auto !important;
-  min-height:0 !important;
-  margin:0 !important;
-  grid-template-columns:28px 1fr !important;
-}
-.empty-slot .num,
-.empty-slot .content.place{
-  height:auto !important;
-  min-height:0 !important;
-}
-.empty-slot .content.place{
-  padding:0 8px !important;
-}
-@media(max-width:900px){
-  .screen{height:720px !important;min-height:720px !important}
-  .screen-head{height:43px !important;min-height:43px !important}
-  .rows{height:calc(100% - 43px) !important}
-}
-
-/* V13 — MSA M1 screen geometry based on supplied M1 video frames */
-.ecb-shell{
-  max-width:760px !important;
-  padding:16px !important;
-}
-.screen{
-  width:430px !important;
-  max-width:100% !important;
-  height:700px !important;
-  min-height:700px !important;
-  margin:0 auto !important;
-  background:#c9cccd !important;
-  border:6px solid #080a0b !important;
-  border-radius:3px !important;
-  box-shadow:0 3px 12px #000 !important;
-}
-.screen-head{
-  height:76px !important;
-  min-height:76px !important;
-  padding:0 12px !important;
-  gap:9px !important;
-  background:#3c4347 !important;
-  font-family:Arial,"Helvetica Neue",sans-serif !important;
-  font-size:14px !important;
-}
-.screen-head .hamb{font-size:24px !important}
-.screen-head .grow{font-size:16px !important}
-.screen-head .mode{font-size:12px !important}
-.screen-head .conn{font-size:12px !important}
-.screen-head .battery{font-size:12px !important}
-.screen-head .battery b{font-size:14px !important}
-
-.rows{
-  height:calc(100% - 76px) !important;
-  padding:4px !important;
-  background:#c9cccd !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:4px !important;
-}
-
-/* Empty M1: six equal channels fill the entire display */
-.rows:not(:has(.row:not(.empty-slot))){
-  display:grid !important;
-  grid-template-rows:repeat(6,minmax(0,1fr)) !important;
-  gap:4px !important;
-}
-.rows:not(:has(.row:not(.empty-slot))) .row.empty-slot{
-  height:auto !important;
-  min-height:0 !important;
-}
-
-/* Mixed/occupied M1: compact but much closer to the real display */
-.rows:has(.row:not(.empty-slot)) .row{
-  min-height:88px !important;
-  height:auto !important;
-  flex:0 0 auto !important;
-}
-.rows:has(.row:not(.empty-slot)) .row.empty-slot{
-  min-height:76px !important;
-  height:76px !important;
-}
-
-.row{
-  width:100% !important;
-  margin:0 !important;
-  grid-template-columns:48px 1fr 72px !important;
-  border:1px solid #f5f5f5 !important;
-  background:#73797c !important;
-}
-.num{
-  font-size:18px !important;
-  font-weight:700 !important;
-}
-.num.committed{
-  background:#0a9d47 !important;
-}
-.content{
-  padding:7px 10px !important;
-}
-.place{
-  font-size:15px !important;
-  font-style:italic !important;
-  font-weight:600 !important;
-  background:#7d8386 !important;
-}
-.name{
-  font-size:12px !important;
-  line-height:1.1 !important;
-}
-.pressure{
-  font-size:27px !important;
-  line-height:1.0 !important;
-}
-.pressure small{
-  font-size:13px !important;
-}
-.bar{
-  height:5px !important;
-  margin-top:5px !important;
-}
-.meta{
-  font-size:11px !important;
-  margin-top:5px !important;
-}
-.slot-action{
-  font-size:10px !important;
-  line-height:1.05 !important;
-  padding:4px !important;
-  white-space:normal !important;
-}
-.alarm-panel{
-  font-size:13px !important;
-  padding:7px !important;
-}
-.ack{
-  min-height:30px !important;
-  font-size:10px !important;
-}
-
-/* Supplied M1 frames show the alarm/confirmation as a full-width coloured
-   section, not a tiny notification strip. */
-.row.alarm .content,
-.row.alarm .alarm-panel{
-  background:#f1d31b !important;
-}
-.row.alarm .alarm-panel.active,
-.row.alarm.danger .alarm-panel{
-  background:#ed1c24 !important;
-  color:#fff !important;
-}
-
-/* Keep EVACUATE legible at all times */
-.slot-action.evac,
-.slot-action{
-  font-family:Arial,"Helvetica Neue",sans-serif !important;
-  font-weight:700 !important;
-  letter-spacing:-.2px !important;
-}
-
-/* Instructor: make it an actual control console rather than a small web form */
-.controller{
-  width:min(1180px,96vw) !important;
-  border-radius:4px !important;
-}
-.controller h2{
-  font-family:Arial,"Helvetica Neue",sans-serif !important;
-  font-size:18px !important;
-  padding:16px 18px !important;
-}
-.controller-body{
-  padding:16px !important;
-}
-.info{
-  font-size:11px !important;
-  line-height:1.45 !important;
-}
-.card{
-  border-radius:3px !important;
-  padding:12px !important;
-}
-.card-head{
-  font-size:13px !important;
-}
-.controller-card-grid{
-  grid-template-columns:repeat(4,1fr) !important;
-  gap:7px !important;
-}
-.controller-card-grid button,
-.force-btn{
-  min-height:42px !important;
-  font-size:10px !important;
-}
-input,select{
-  font-size:11px !important;
-  padding:8px !important;
-}
-.controller-section-title{
-  font-size:10px !important;
-  letter-spacing:.2px !important;
-}
-@media(max-width:650px){
-  .screen{
-    width:96vw !important;
-    height:calc(96vw * 1.63) !important;
-    min-height:560px !important;
-    max-height:760px !important;
-  }
-  .screen-head{height:68px !important;min-height:68px !important}
-  .rows{height:calc(100% - 68px) !important}
-  .row{grid-template-columns:40px 1fr 68px !important}
-  .pressure{font-size:23px !important}
-  .place{font-size:12px !important}
-  .controller-card-grid{grid-template-columns:repeat(2,1fr) !important}
-}
-
-
-/* ================= MSA M1 V14 VISUAL RECONSTRUCTION ================= */
-:root{
- --m1-header:#55595b;
- --m1-white:#f7f8f8;
- --m1-slot:#9a9fa1;
- --m1-slot-dark:#777d80;
- --m1-divider:#e9eaeb;
- --m1-green:#80d13d;
- --m1-yellow:#f2dc35;
- --m1-red:#d74d3e;
- --m1-text:#262a2c;
-}
-body{font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif!important}
-.screen-frame{
- width:min(520px,88vw)!important;
- aspect-ratio:0.645/1!important;
- height:auto!important;
- padding:7px!important;
- border-width:6px!important;
- border-radius:5px!important;
-}
-.screen{
- min-height:0!important;
- height:100%!important;
- background:var(--m1-white)!important;
- border:0!important;
-}
-.screen-head{
- height:94px!important;
- background:#565a5c!important;
- padding:12px 12px 9px!important;
- gap:9px!important;
- align-items:flex-start!important;
- font-weight:400!important;
-}
-.hamb{font-size:24px!important;margin-top:18px!important;color:#fff!important}
-.head-identity{line-height:1!important;min-width:100px}
-.ecp-name{font-size:13px!important;font-weight:700!important;margin-bottom:4px!important}
-.ecp-time{font-size:25px!important;font-weight:400!important;letter-spacing:-.7px!important}
-.ecp-operator{font-size:9px!important;margin-top:4px!important}
-.head-spacer{flex:1}
-.head-status{display:flex;align-items:center;gap:5px;margin-top:15px}
-.head-status .mode{font-size:9px!important;font-weight:700!important}
-.head-status .conn{font-size:13px!important;color:#1aa1e6!important}
-.head-status .battery{font-size:8px!important}
-.head-status .battery b{font-size:9px!important}
-.rows{
- height:calc(100% - 94px)!important;
- padding:6px 5px 5px!important;
- background:#f3f4f4!important;
- display:flex!important;
- flex-direction:column!important;
- gap:5px!important;
- overflow:hidden!important;
-}
-.row{
- flex:1 1 0!important;
- min-height:0!important;
- margin:0!important;
- grid-template-columns:47px 1fr 76px!important;
- border:0!important;
- background:var(--m1-white)!important;
-}
-.row .num{
- font-size:19px!important;
- font-weight:400!important;
- background:var(--m1-slot-dark)!important;
-}
-.row .num.committed{background:#84d64c!important;color:#fff!important}
-.row .content{padding:7px 10px!important;background:#fff!important}
-.row .place{
- background:var(--m1-slot)!important;
- color:#fff!important;
- font-size:16px!important;
- font-style:italic!important;
- font-weight:400!important;
- padding-left:14px!important;
-}
-.name{
- position:absolute!important;
- left:10px!important;
- top:5px!important;
- font-size:10px!important;
- font-weight:700!important;
- color:#505457!important;
-}
-.pressure{
- font-size:29px!important;
- line-height:1!important;
- font-weight:400!important;
- letter-spacing:-1.1px!important;
- margin-top:2px!important;
-}
-.pressure small{font-size:17px!important;font-weight:400!important;letter-spacing:-.2px!important}
-.bar{
- height:6px!important;
- margin-top:5px!important;
- background:#8fd24b!important;
-}
-.meta{
- font-size:11px!important;
- color:#606467!important;
- margin-top:7px!important;
-}
-.telemetry-dot{display:flex!important;align-items:center!important;gap:7px!important}
-.m1-icon{width:16px;height:16px;display:inline-block}
-.m1-bin{width:13px;height:13px;display:inline-block}
-.bin-btn{
- border:0!important;background:transparent!important;color:#555!important;
- padding:1px!important;min-width:17px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
-}
-.action{
- min-width:76px!important;
- background:#777d80!important;
- color:#fff!important;
- font-size:8px!important;
- font-weight:700!important;
- border:0!important;
- padding:4px!important;
-}
-.m1-evac{width:29px;height:29px;display:inline-block}
-.action b{font-size:8px!important;letter-spacing:-.1px!important}
-.alarm-panel{
- margin:0!important;
- min-height:42px!important;
- border:0!important;
- background:#d74d3e!important;
- padding:7px!important;
- font-size:14px!important;
-}
-.alarm-panel .confirm{
- background:#777d80!important;
- color:#fff!important;
- border:0!important;
- min-width:110px!important;
- padding:7px 10px!important;
-}
-.alarm-row .content,.alarm-row .num,.low-row .content,.low-row .num{background:#d74d3e!important;color:#fff!important}
-.alarm-row .content .pressure,.alarm-row .content .meta{color:#fff!important}
-.alarm-row .bar{background:#f1d43b!important}
-.evac-status{font-size:8px!important}
-.menu{
- top:0!important;
- height:100%!important;
- width:78%!important;
- max-width:340px!important;
- background:#454a4c!important;
- padding:0!important;
- border-right:1px solid #697074!important;
-}
-.menu-app{
- height:90px!important;
- display:flex!important;
- align-items:center!important;
- gap:15px!important;
- padding:12px 18px!important;
- background:#454a4c!important;
- color:#fff!important;
-}
-.menu-icon{width:46px;height:46px;border:1px solid #c8cccd;display:flex;align-items:center;justify-content:center;font-size:26px}
-.menu-app b,.menu-app strong{display:block}
-.menu-app b{font-size:11px}
-.menu-app strong{font-size:15px;margin-top:4px}
-.menu-section-title{padding:14px 18px 4px;color:#fff;font-size:11px;font-weight:700}
-.menu button{border:0!important;border-top:1px solid #62686a!important;border-radius:0!important;margin:0!important;background:#454a4c!important;padding:11px 18px!important;font-size:10px!important;color:#fff!important}
-.menu .radio-btn{text-align:left}
-.menu .radio-btn span{font-size:18px;margin-right:8px}
-.menu .radio-btn.active{background:#596063!important}
-.menu-line{display:grid!important;grid-template-columns:25px 1fr 20px;align-items:center;text-align:left!important}
-.menu-line .mi{font-size:16px}
-.menu-line small{font-size:8px;color:#bfc4c5}
-.menu-big{margin:14px auto 0!important;width:78%!important;background:#f1f2f2!important;color:#7d8284!important;border:0!important;text-align:center!important}
-.menu-big+.menu-big{margin-top:10px!important}
-.menu-reset{margin-top:10px!important;color:#ffb4b0!important}
-.menu-note{padding:12px 18px!important}
-.footer-controls{margin-top:10px!important}
-@media(max-width:650px){
- .screen-frame{width:94vw!important}
-}
-
-</style>
-
-
-<style id="v17-team-selection-fix">
-.team-strip-inline{
-  position:relative !important;
-  z-index:50 !important;
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:2px !important;
-  min-height:58px !important;
-  height:auto !important;
-  margin:-1px 0 5px 46px !important;
-  padding:0 !important;
-}
-.team-strip-inline button{
-  appearance:none !important;
-  -webkit-appearance:none !important;
-  min-height:56px !important;
-  border:0 !important;
-  border-radius:0 !important;
-  color:#fff !important;
-  font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif !important;
-  font-size:15px !important;
-  font-weight:700 !important;
-  cursor:pointer !important;
-  pointer-events:auto !important;
-}
-.team-strip-inline .inline-new{
-  background:#41474a !important;
-}
-.team-strip-inline .inline-existing{
-  background:#83d65d !important;
-}
-.team-strip-inline button:active{
-  filter:brightness(.88) !important;
-}
-</style>
-
-
-<style id="v18-evac-flow">
-/* M1 evacuation-state colours: the running-man/exit symbol changes with state. */
-.action.evac-action{
-  color:#f4f4f4 !important;
-  background:#646a6d !important;
-}
-.action.evac-action.sent{
-  color:#d71920 !important;
-  background:#646a6d !important;
-}
-.action.evac-action.received{
-  color:#e0bd00 !important;
-  background:#646a6d !important;
-}
-.action.evac-action.confirmed{
-  color:#16a05a !important;
-  background:#646a6d !important;
-}
-.action.evac-action.sent .m1-evac,
-.action.evac-action.received .m1-evac,
-.action.evac-action.confirmed .m1-evac{
-  color:inherit !important;
-}
-.action.evac-action b{
-  color:inherit !important;
-}
-.action.evac-action .m1-evac{
-  width:30px !important;
-  height:30px !important;
-  margin-bottom:3px !important;
-}
-.bin-btn{
-  cursor:pointer !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-.bin-btn:hover{color:#d71920 !important}
-
-/* Instructor: clearly distinguish a simulated BA-wearer evacuation signal
-   from the ECO's own evacuation command. */
-.controller-card-grid .wearer-evac{
-  background:#d71920 !important;
-  color:#fff !important;
-  font-weight:900 !important;
-}
-.controller-card-grid .wearer-evac:hover{filter:brightness(.92)}
-</style>
-
-
-<style id="v19-team-group">
-.team-group{margin:0 0 4px 0;background:#dfe1e2;border-bottom:2px solid #fff}
-.team-main{display:grid;grid-template-columns:42px 1fr 70px;align-items:stretch;background:#fff}
-.team-num{display:flex;align-items:center;justify-content:center;background:#7bd23b;color:#fff;font-size:19px;font-weight:400}
-.team-members{min-width:0;background:#fff}
-.member-row{padding:7px 10px 5px;border-bottom:2px solid #e7e8e8;background:#fff;min-height:78px;box-sizing:border-box}
-.member-row:last-child{border-bottom:0}
-.member-row .pressure-line{min-height:29px}
-.member-row .meta{display:flex;justify-content:space-between;align-items:center}
-.team-main>.evac-action{height:auto;min-height:100%;border-radius:0}
-.member-controller{border:1px solid #4d5558;margin:8px 0;padding:8px;background:#1d2427}
-</style>
-
-
-<style id="v20-team-picker-layout">
-.team-strip-inline{
-  position:relative !important;
-  z-index:20 !important;
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:2px !important;
-  width:calc(100% - 46px) !important;
-  min-height:48px !important;
-  height:48px !important;
-  margin:0 0 3px 46px !important;
-  padding:0 !important;
-  background:#eef0f0 !important;
-  box-sizing:border-box !important;
-}
-.team-strip-inline button{
-  min-height:48px !important;
-  height:48px !important;
-  border:0 !important;
-  border-radius:0 !important;
-  padding:0 6px !important;
-  font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif !important;
-  font-size:13px !important;
-  font-weight:700 !important;
-  line-height:1 !important;
-  cursor:pointer !important;
-}
-.team-strip-inline .inline-new{
-  background:#42484b !important;
-  color:#fff !important;
-}
-.team-strip-inline .inline-existing{
-  background:#82d35b !important;
-  color:#fff !important;
-}
-
-/* Team picker belongs to the occupied team block and must not overlay
-   subsequent ECB positions. */
-.team-block{
-  display:block !important;
-  position:relative !important;
-  width:100% !important;
-  overflow:visible !important;
-}
-</style>
-
 </body>
 </html>
