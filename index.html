@@ -4,7 +4,62 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ECB Training Simulator</title>
-<link rel="stylesheet" href="style.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#071118}
+body{font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+.appbar{height:56px;background:#08496b;border-bottom:3px solid #e31b23;padding:0 30px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800}
+.appbar span{font-size:11px;color:#c9d5da}
+.workspace{min-height:calc(100vh - 56px);display:flex;justify-content:center;padding:30px 14px 42px}
+.m1-shell{width:min(620px,97vw);background:#060707;border:1px solid #25292b;border-radius:7px;padding:9px;box-shadow:0 16px 42px rgba(0,0,0,.48)}
+.m1-screen{overflow:hidden;background:#f1f3f3}
+.m1-header{height:108px;background:#565c5f;border-bottom:5px solid #f4f5f5;display:flex;align-items:center;position:relative;padding:13px 17px}
+.hamburger{width:34px;height:40px;border:0;background:none;padding:4px;margin-right:11px;display:flex;flex-direction:column;gap:5px;justify-content:center;cursor:pointer}
+.hamburger i{display:block;width:23px;height:3px;background:#fff}
+.ecp{font-size:16px;font-weight:700;line-height:18px}
+.clock{font-size:29px;line-height:32px}
+.battery{position:absolute;right:17px;top:26px;font-size:11px;font-weight:800}
+.board{padding:0 6px 6px;background:#eef0f0}
+.slot{margin-bottom:5px;background:#8b9193;border:2px solid #f7f7f7;border-radius:3px;overflow:hidden;color:#fff}
+.empty{height:calc((100vh - 56px - 108px - 70px)/6);min-height:72px;display:grid;grid-template-columns:48px 1fr;align-items:center}
+.num{height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.25);font-size:18px}
+.empty .label{padding-left:18px;font-size:16px;font-style:italic}
+.occupied{background:#fff;color:#222}
+.wearer{display:grid;grid-template-columns:48px 1fr 60px;min-height:96px}
+.wearer .num{background:#7fd448;color:#fff;border-right:0}
+.data{padding:8px 10px 6px}
+.pressure{font-size:29px;line-height:30px}
+.pressure small{font-size:15px}
+.bar{height:5px;background:#82d74e;margin:5px 0 7px}
+.meta{font-size:12px;color:#666;display:flex;justify-content:space-between}
+.evac{border:0;border-left:1px solid #eee;background:#747a7c;color:#fff;font-weight:700;font-size:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+.runner{font-size:26px;line-height:20px}
+.team-picker{display:grid;grid-template-columns:1fr 1fr;margin-left:48px;height:44px}
+.team-picker button{border:0;color:#fff;font-size:12px;font-weight:800;cursor:pointer}
+.new{background:#4d5356}.alpha{background:#82d74e}
+.team-name{height:26px;background:#5b6063;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;padding-left:48px}
+.alarm{background:#df3d32;color:#fff;text-align:center;padding:7px;font-size:13px;font-weight:700}
+.alarm button{display:block;margin:5px auto 0;background:#5b6669;color:#fff;border:0;padding:5px 40px;font-weight:800;cursor:pointer}
+.sim-controls{padding-top:9px;display:flex;gap:8px}
+.sim-controls button{background:#536a74;color:#fff;border:0;padding:10px 16px;font-size:12px;font-weight:800;cursor:pointer}
+.sim-controls button:hover,.team-picker button:hover,.evac:hover{filter:brightness(1.1)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.58);display:flex;align-items:center;justify-content:center;z-index:20}
+.hidden{display:none}
+.dialog{width:300px;background:#f7f7f7;color:#333;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.5)}
+.dialog h3{margin:0 0 15px;font-size:16px}
+.dialog label{font-size:11px;color:#777;display:block;margin-bottom:4px}
+.dialog input{width:100%;height:36px;border:1px solid #ccc;padding:0 8px}
+.dialog-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}
+.dialog button{border:0;padding:8px 13px;font-size:11px;font-weight:800;cursor:pointer}
+.dialog .ok{background:#159447;color:#fff}
+@media(max-width:700px){
+.appbar{height:54px;padding:0 14px;font-size:12px}.appbar span{display:none}
+.workspace{min-height:calc(100vh - 54px);padding:17px 6px 25px}
+.m1-shell{width:98vw;padding:7px}.m1-header{height:104px}
+.empty{min-height:65px;grid-template-columns:43px 1fr}.empty .label{padding-left:14px;font-size:15px}
+.wearer{grid-template-columns:43px 1fr 54px}.team-picker{margin-left:43px}.pressure{font-size:25px}
+}
+</style>
 </head>
 <body>
 <header class="appbar"><strong>ECB TRAINING SIMULATOR</strong><span>ECB-ALPHA</span></header>
@@ -12,15 +67,15 @@
 <section class="m1-shell">
 <div class="m1-screen">
 <header class="m1-header">
-<button class="hamburger" onclick="openMenu()" aria-label="Menu"><i></i><i></i><i></i></button>
+<button class="hamburger" id="menuButton" aria-label="Menu"><i></i><i></i><i></i></button>
 <div><div class="ecp">ECP ALPHA</div><div class="clock" id="clock">13:14</div></div>
-<div class="battery">BAT <b id="battery">100</b>%</div>
+<div class="battery">BAT <b>100</b>%</div>
 </header>
 <section class="board" id="board"></section>
 </div>
 <div class="sim-controls">
-<button type="button" onclick="addTally()">PLACE TALLY</button>
-<button type="button" onclick="resetBoard()">RESET</button>
+<button type="button" id="tallyButton">PLACE TALLY</button>
+<button type="button" id="resetButton">RESET</button>
 </div>
 </section>
 </main>
@@ -30,9 +85,84 @@
 <h3>Select a team name</h3>
 <label for="teamInput">Team Name</label>
 <input id="teamInput" placeholder="e.g. Alpha 1" autocomplete="off">
-<div class="dialog-actions"><button type="button" onclick="closeModal()">CANCEL</button><button type="button" class="ok" onclick="saveTeam()">OK</button></div>
+<div class="dialog-actions"><button type="button" id="cancelTeam">CANCEL</button><button type="button" class="ok" id="saveTeam">OK</button></div>
 </div>
 </div>
-<script src="simulator.js"></script>
+
+<script>
+(function(){
+"use strict";
+var state={wearers:[],pendingSlot:null};
+
+function findWearer(slot){
+  for(var i=0;i<state.wearers.length;i++) if(state.wearers[i].slot===slot) return state.wearers[i];
+  return null;
+}
+function esc(v){
+  return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function render(){
+  var board=document.getElementById("board"), html="";
+  for(var i=1;i<=6;i++){
+    var w=findWearer(i);
+    if(!w){
+      html+='<div class="slot empty"><div class="num">'+i+'</div><div class="label">Slot Available</div></div>';
+    }else{
+      var alarm=w.alarm?'<div class="alarm">'+esc(w.alarm)+'<button type="button" data-confirm="'+i+'">CONFIRM</button></div>':'';
+      var team=w.team
+        ? '<div class="team-name">'+esc(w.team)+'</div>'
+        : '<div class="team-picker"><button class="new" type="button" data-new="'+i+'">NEW TEAM</button><button class="alpha" type="button" data-alpha="'+i+'">ALPHA 1</button></div>';
+      html+='<div class="slot occupied">'+alarm+
+        '<div class="wearer"><div class="num">'+i+'</div><div class="data">'+
+        '<div class="pressure">'+w.pressure+'<small>bar</small></div><div class="bar"></div>'+
+        '<div class="meta"><span>TOW: '+w.tow+'</span><span>◉</span><span>▣</span></div>'+
+        '</div><button class="evac" type="button" data-evac="'+i+'"><span class="runner">↪</span><span>EVACUATE</span></button></div>'+
+        team+'</div>';
+    }
+  }
+  board.innerHTML=html;
+}
+function addTally(){
+  if(state.wearers.length>=6){alert("All six ECB slots are occupied.");return;}
+  var slot=1; while(findWearer(slot)) slot++;
+  state.wearers.push({slot:slot,pressure:299,tow:"18:41",team:null,alarm:null});
+  render();
+  state.pendingSlot=slot;
+  openModal();
+}
+function openModal(){
+  document.getElementById("teamModal").classList.remove("hidden");
+  var input=document.getElementById("teamInput"); input.value="";
+  setTimeout(function(){input.focus();},40);
+}
+function closeModal(){document.getElementById("teamModal").classList.add("hidden");state.pendingSlot=null;}
+function saveTeam(){
+  var w=findWearer(state.pendingSlot);
+  if(w){w.team=document.getElementById("teamInput").value.trim()||"ALPHA 1";}
+  closeModal();render();
+}
+function reset(){state.wearers=[];state.pendingSlot=null;closeModal();render();}
+function sendEvac(slot){var w=findWearer(slot);if(w){w.alarm="Evacuation Sent";render();}}
+function confirmEvac(slot){var w=findWearer(slot);if(w){w.alarm="Evacuation Confirmed";render();}}
+function setAlpha(slot){var w=findWearer(slot);if(w){w.team="ALPHA 1";render();}}
+function newTeam(slot){state.pendingSlot=slot;openModal();}
+document.getElementById("tallyButton").addEventListener("click",addTally);
+document.getElementById("resetButton").addEventListener("click",reset);
+document.getElementById("cancelTeam").addEventListener("click",closeModal);
+document.getElementById("saveTeam").addEventListener("click",saveTeam);
+document.getElementById("teamInput").addEventListener("keydown",function(e){if(e.key==="Enter")saveTeam();if(e.key==="Escape")closeModal();});
+document.getElementById("board").addEventListener("click",function(e){
+  var b=e.target.closest("button"); if(!b)return;
+  if(b.dataset.alpha)setAlpha(Number(b.dataset.alpha));
+  else if(b.dataset.new)newTeam(Number(b.dataset.new));
+  else if(b.dataset.evac)sendEvac(Number(b.dataset.evac));
+  else if(b.dataset.confirm)confirmEvac(Number(b.dataset.confirm));
+});
+document.getElementById("menuButton").addEventListener("click",function(){alert("Menu will be built after the display/state flow is locked.");});
+document.getElementById("teamModal").addEventListener("click",function(e){if(e.target===this)closeModal();});
+function clock(){document.getElementById("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",hour12:false});}
+render();clock();setInterval(clock,1000);
+})();
+</script>
 </body>
 </html>
