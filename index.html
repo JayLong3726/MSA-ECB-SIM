@@ -1,20 +1,25 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ECB Simulator</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MSA ECB Simulator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="app-header">
-    <strong>MSA ENTRY CONTROL BOARD SIMULATOR</strong>
-    <a href="?controller=1">INSTRUCTOR CONTROLLER</a>
-  </header>
-
-  <main id="app"></main>
-
-  <script src="simulator.js"></script>
-  <script src="controller.js"></script>
+<div class="app-shell">
+<header class="topbar"><div>MSA ENTRY CONTROL BOARD SIMULATOR</div><div class="session">ECB-ALPHA</div></header>
+<main class="stage">
+<section class="device"><div class="screen">
+<header class="m1-header">
+<div class="hamburger"><span></span><span></span><span></span></div>
+<div class="identity"><div class="ecp">ECP ALPHA</div><div class="time" id="clock">13:14</div></div>
+<div class="battery">BAT <span id="battery">100</span>%</div>
+</header>
+<div class="display"><div class="slots" id="slots"></div></div>
+</div></section>
+</main>
+</div>
+<script src="simulator.js"></script>
 </body>
 </html>
