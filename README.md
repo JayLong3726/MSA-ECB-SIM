@@ -1,7 +1,5 @@
-# MSA ECB Simulator
+# ECB Simulator — Stage 1 UI v2
 
-Stage 1: visual M1-style display foundation.
+Visual foundation for an unofficial M1 Entry Control Board training simulator.
 
-This is an unofficial training simulator and is not an MSA product.
-
-Next stages will add the tally workflow, teams, wearers, alarms, evacuation states and instructor controller.
+This revision concentrates on the central display proportions, six-slot layout, typography, spacing, header and M1-style colour hierarchy. Functionality is intentionally not added yet so the display can be visually locked before the simulator state machine is built.
