@@ -7,43 +7,30 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="appbar">
-  <strong>ECB TRAINING SIMULATOR</strong>
-  <span>ECB-ALPHA</span>
-</header>
-
+<header class="appbar"><strong>ECB TRAINING SIMULATOR</strong><span>ECB-ALPHA</span></header>
 <main class="workspace">
-  <section class="m1-shell">
-    <div class="m1-screen">
-      <header class="m1-header">
-        <button class="hamburger" aria-label="Menu"><i></i><i></i><i></i></button>
-        <div class="heading">
-          <div class="ecp">ECP ALPHA</div>
-          <div class="clock" id="clock">13:14</div>
-        </div>
-        <div class="battery">BAT <b id="battery">100</b>%</div>
-      </header>
-
-      <section class="board" id="board"></section>
-    </div>
-
-    <div class="sim-controls">
-      <button id="tallyBtn">PLACE TALLY</button>
-      <button id="resetBtn">RESET</button>
-    </div>
-  </section>
+<section class="m1-shell">
+<div class="m1-screen">
+<header class="m1-header">
+<button class="hamburger"><i></i><i></i><i></i></button>
+<div><div class="ecp">ECP ALPHA</div><div class="clock" id="clock">13:14</div></div>
+<div class="battery">BAT <b id="battery">100</b>%</div>
+</header>
+<section class="board" id="board"></section>
+</div>
+<div class="sim-controls">
+<button id="tallyBtn">PLACE TALLY</button>
+<button id="resetBtn">RESET</button>
+</div>
+</section>
 </main>
 
-<div class="modal-backdrop hidden" id="teamModal">
-  <div class="team-modal">
-    <div class="modal-title">Select a team name</div>
-    <label for="teamName">Team Name</label>
-    <input id="teamName" placeholder="e.g. Alpha 1">
-    <div class="modal-actions">
-      <button id="cancelTeam">CANCEL</button>
-      <button id="saveTeam">OK</button>
-    </div>
-  </div>
+<div class="modal hidden" id="teamModal">
+<div class="dialog">
+<h3>Select a team name</h3>
+<label>Team Name</label><input id="teamInput" placeholder="e.g. Alpha 1">
+<div><button id="cancelTeam">CANCEL</button><button class="ok" id="saveTeam">OK</button></div>
+</div>
 </div>
 
 <script src="simulator.js"></script>

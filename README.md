@@ -1,16 +1,15 @@
-# ECB Simulator — M1 UI Stage 2
+# ECB Simulator — Stage 3 M1 State Flow
 
-This stage uses the supplied M1 reference screenshots as visual and interaction inspiration.
+Visual/state foundation based on the supplied M1 screenshots.
 
-Implemented here:
-- M1-style central display
-- six-slot layout
-- empty slot presentation
-- tally creates a wearer
-- team selection prompt
-- same-team quick selection
+Current local interactions:
+- six empty slots
+- place tally
+- team selection
+- same-team Alpha 1 selection
+- pressure/TOW wearer card
+- evacuation state
+- alarm confirmation state
 - reset
-- pressure/TOW visual structure
-- evacuation control placeholder
 
 This is an unofficial training simulator and is not an MSA product.

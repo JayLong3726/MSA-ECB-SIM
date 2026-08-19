@@ -1,1 +1,1 @@
-// Controller layer will be connected to the simulator state after the M1 interaction flow is locked.
+// Controller integration follows after the local M1 state flow is locked.
