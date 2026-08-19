@@ -1,22 +1,88 @@
-const state={wearers:[],battery:100};let pending=null;
-function render(){
- const b=document.getElementById("board");b.innerHTML="";
- for(let i=1;i<=6;i++){
-  const w=state.wearers.find(x=>x.slot===i);
-  if(!w){b.insertAdjacentHTML("beforeend",`<div class="slot empty"><div class="num">${i}</div><div class="label">Slot Available</div></div>`);continue}
-  let alarm=w.alarm?`<div class="alarm">${w.alarm}<button onclick="confirmAlarm(${i})">CONFIRM</button></div>`:"";
-  let team=w.team?`<div class="team-name">${w.team}</div>`:`<div class="team-picker"><button class="new" onclick="newTeam(${i})">NEW TEAM</button><button class="alpha" onclick="useAlpha(${i})">ALPHA 1</button></div>`;
-  b.insertAdjacentHTML("beforeend",`<div class="slot occupied">${alarm}<div class="wearer"><div class="num">${i}</div><div class="data"><div class="pressure">${w.pressure}<small>bar</small></div><div class="bar"></div><div class="meta"><span>TOW: ${w.tow}</span><span>◉</span><span>▣</span></div></div><button class="evac" onclick="sendEvac(${i})"><span class="runner">↪</span><span>EVACUATE</span></button></div>${team}</div>`);
- }
+var ECB={wearers:[],battery:100,pendingSlot:null};
+
+function renderBoard(){
+  var board=document.getElementById("board");
+  if(!board)return;
+  var html="";
+  for(var i=1;i<=6;i++){
+    var w=null;
+    for(var j=0;j<ECB.wearers.length;j++){if(ECB.wearers[j].slot===i)w=ECB.wearers[j];}
+    if(!w){
+      html+='<div class="slot empty"><div class="num">'+i+'</div><div class="label">Slot Available</div></div>';
+      continue;
+    }
+    var teamHtml=w.team
+      ? '<div class="team-name">'+escapeHtml(w.team)+'</div>'
+      : '<div class="team-picker"><button class="new" type="button" onclick="newTeam('+i+')">NEW TEAM</button><button class="alpha" type="button" onclick="useAlpha('+i+')">ALPHA 1</button></div>';
+    var alarmHtml=w.alarm
+      ? '<div class="alarm">'+escapeHtml(w.alarm)+'<button type="button" onclick="confirmAlarm('+i+')">CONFIRM</button></div>'
+      : '';
+    html+='<div class="slot occupied">'+alarmHtml+
+      '<div class="wearer"><div class="num">'+i+'</div><div class="data">'+
+      '<div class="pressure">'+w.pressure+'<small>bar</small></div><div class="bar"></div>'+
+      '<div class="meta"><span>TOW: '+w.tow+'</span><span>◉</span><span>▣</span></div>'+
+      '</div><button class="evac" type="button" onclick="sendEvac('+i+')"><span class="runner">↪</span><span>EVACUATE</span></button></div>'+
+      teamHtml+'</div>';
+  }
+  board.innerHTML=html;
 }
-function add(){if(state.wearers.length>=6)return;let slot=state.wearers.length+1;state.wearers.push({slot,pressure:299,tow:"18:41",team:null,alarm:null});render();pending=slot;openModal()}
-function openModal(){document.getElementById("teamModal").classList.remove("hidden");document.getElementById("teamInput").focus()}
-function closeModal(){document.getElementById("teamModal").classList.add("hidden");pending=null}
-function save(){let name=document.getElementById("teamInput").value.trim()||"ALPHA 1";let w=state.wearers.find(x=>x.slot===pending);if(w)w.team=name;document.getElementById("teamInput").value="";closeModal();render()}
-function newTeam(slot){pending=slot;openModal()}
-function useAlpha(slot){let w=state.wearers.find(x=>x.slot===slot);if(w)w.team="ALPHA 1";render()}
-function sendEvac(slot){let w=state.wearers.find(x=>x.slot===slot);if(w)w.alarm="Evacuation Sent";render()}
-function confirmAlarm(slot){let w=state.wearers.find(x=>x.slot===slot);if(w)w.alarm="Evacuation Confirmed";render()}
-function reset(){state.wearers=[];state.battery=100;render()}
-function clock(){document.getElementById("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",hour12:false})}
-document.getElementById("tallyBtn").onclick=add;document.getElementById("resetBtn").onclick=reset;document.getElementById("cancelTeam").onclick=closeModal;document.getElementById("saveTeam").onclick=save;document.getElementById("teamInput").onkeydown=e=>{if(e.key==="Enter")save();if(e.key==="Escape")closeModal()};render();clock();setInterval(clock,1000);
+
+function addTally(){
+  if(ECB.wearers.length>=6){alert("All six ECB slots are occupied.");return;}
+  var slot=1;
+  while(ECB.wearers.some(function(w){return w.slot===slot;}))slot++;
+  ECB.wearers.push({slot:slot,pressure:299,tow:"18:41",team:null,alarm:null});
+  renderBoard();
+  ECB.pendingSlot=slot;
+  openModal();
+}
+
+function openModal(){
+  var modal=document.getElementById("teamModal");
+  var input=document.getElementById("teamInput");
+  modal.classList.remove("hidden");
+  input.value="";
+  setTimeout(function(){input.focus();},50);
+}
+
+function closeModal(){
+  document.getElementById("teamModal").classList.add("hidden");
+  ECB.pendingSlot=null;
+}
+
+function saveTeam(){
+  var input=document.getElementById("teamInput");
+  var name=input.value.trim()||"ALPHA 1";
+  var w=ECB.wearers.find(function(x){return x.slot===ECB.pendingSlot;});
+  if(w)w.team=name;
+  closeModal();
+  renderBoard();
+}
+
+function newTeam(slot){ECB.pendingSlot=slot;openModal();}
+function useAlpha(slot){
+  var w=ECB.wearers.find(function(x){return x.slot===slot;});
+  if(w)w.team="ALPHA 1";
+  renderBoard();
+}
+function sendEvac(slot){
+  var w=ECB.wearers.find(function(x){return x.slot===slot;});
+  if(w){w.alarm="Evacuation Sent";renderBoard();}
+}
+function confirmAlarm(slot){
+  var w=ECB.wearers.find(function(x){return x.slot===slot;});
+  if(w){w.alarm="Evacuation Confirmed";renderBoard();}
+}
+function resetBoard(){ECB.wearers=[];ECB.battery=100;renderBoard();}
+function openMenu(){alert("M1 menu will be implemented in the next stage.");}
+function updateClock(){
+  var el=document.getElementById("clock");
+  if(el)el.textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"})[c];});}
+
+document.addEventListener("DOMContentLoaded",function(){
+  renderBoard();
+  updateClock();
+  setInterval(updateClock,1000);
+});

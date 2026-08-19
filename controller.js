@@ -1,1 +1,1 @@
-// Controller integration follows after the local M1 state flow is locked.
+// Instructor controller reserved for the next stage.

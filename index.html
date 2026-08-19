@@ -12,15 +12,15 @@
 <section class="m1-shell">
 <div class="m1-screen">
 <header class="m1-header">
-<button class="hamburger"><i></i><i></i><i></i></button>
+<button class="hamburger" onclick="openMenu()" aria-label="Menu"><i></i><i></i><i></i></button>
 <div><div class="ecp">ECP ALPHA</div><div class="clock" id="clock">13:14</div></div>
 <div class="battery">BAT <b id="battery">100</b>%</div>
 </header>
 <section class="board" id="board"></section>
 </div>
 <div class="sim-controls">
-<button id="tallyBtn">PLACE TALLY</button>
-<button id="resetBtn">RESET</button>
+<button type="button" onclick="addTally()">PLACE TALLY</button>
+<button type="button" onclick="resetBoard()">RESET</button>
 </div>
 </section>
 </main>
@@ -28,11 +28,11 @@
 <div class="modal hidden" id="teamModal">
 <div class="dialog">
 <h3>Select a team name</h3>
-<label>Team Name</label><input id="teamInput" placeholder="e.g. Alpha 1">
-<div><button id="cancelTeam">CANCEL</button><button class="ok" id="saveTeam">OK</button></div>
+<label for="teamInput">Team Name</label>
+<input id="teamInput" placeholder="e.g. Alpha 1" autocomplete="off">
+<div class="dialog-actions"><button type="button" onclick="closeModal()">CANCEL</button><button type="button" class="ok" onclick="saveTeam()">OK</button></div>
 </div>
 </div>
-
 <script src="simulator.js"></script>
 </body>
 </html>
