@@ -2,238 +2,339 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ECB Training Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MSA ECB Simulator</title>
 <style>
-  * { box-sizing: border-box; }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#070f14}
+  body{
+    font-family:"Roboto Condensed","Arial Narrow",Arial,sans-serif;
+    color:#fff;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:geometricPrecision;
+  }
 
   :root{
-    --screen:#5b6063;
-    --slot:#878d8f;
-    --white:#f3f4f4;
-    --navy:#071118;
-    --red:#ed1c24;
-  }
-
-  html,body{
-    margin:0;
-    min-height:100%;
-    background:var(--navy);
-    font-family:"Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif;
-  }
-
-  body{
-    color:white;
-    overflow-x:hidden;
-  }
-
-  /* Simple simulator wrapper around the replica */
-  .sim-header{
-    height:56px;
-    background:#084b6d;
-    border-bottom:3px solid var(--red);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 30px;
-    font-weight:700;
-    font-size:15px;
-  }
-
-  .sim-header-right{
-    font-size:12px;
-  }
-
-  .stage{
-    min-height:calc(100vh - 56px);
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding:28px 12px 30px;
+    --header:#585b5e;
+    --slot:#686b6e;
+    --page:#f3f3f3;
+    --green:#72d63b;
+    --red:#ff210d;
+    --dark:#5f6265;
+    --white:#fff;
   }
 
   .device{
-    width:min(650px,96vw);
-    background:#050505;
-    border:1px solid #1c1f20;
-    border-radius:7px;
-    padding:9px;
-    box-shadow:0 15px 40px rgba(0,0,0,.45);
-  }
-
-  .screen{
     width:100%;
-    background:#f2f3f3;
+    min-height:100vh;
+    background:var(--page);
     overflow:hidden;
   }
 
-  .top{
-    height:142px;
-    background:var(--screen);
+  /* MSA top display */
+  .topbar{
+    height:151px;
+    background:var(--header);
     position:relative;
-    display:flex;
-    align-items:flex-start;
-    padding:21px 34px;
+    color:#fff;
   }
 
   .hamburger{
-    width:34px;
-    margin-right:17px;
-    padding-top:5px;
+    position:absolute;
+    left:27px;
+    top:56px;
+    width:40px;
+    height:36px;
   }
-
-  .hamburger span{
+  .hamburger i{
     display:block;
     height:4px;
-    width:28px;
+    margin-bottom:7px;
     background:#fff;
-    margin-bottom:6px;
+    border-radius:0;
   }
 
-  .time{
-    font-size:38px;
+  .clock{
+    position:absolute;
+    left:95px;
+    top:26px;
+    font-size:43px;
+    line-height:1;
     font-weight:300;
-    line-height:42px;
-    letter-spacing:-1px;
+    letter-spacing:-1.1px;
   }
 
   .battery{
     position:absolute;
-    top:26px;
-    right:25px;
-    font-size:14px;
-    font-weight:700;
-  }
-
-  .content{
-    background:#f1f2f2;
-    padding:10px 7px 7px;
-  }
-
-  .slot{
-    height:calc((100vh - 56px - 142px - 55px) / 6);
-    min-height:100px;
-    max-height:145px;
-    margin-bottom:7px;
-    border-radius:11px;
-    background:var(--slot);
-    display:grid;
-    grid-template-columns:76px 1fr;
+    right:29px;
+    top:27px;
+    display:flex;
     align-items:center;
-    color:#fff;
+    gap:7px;
+    font-size:16px;
+    font-weight:400;
+  }
+  .battery-shape{
+    width:27px;
+    height:15px;
+    border:2px solid #fff;
+    border-radius:2px;
+    position:relative;
+  }
+  .battery-shape:after{
+    content:"";
+    position:absolute;
+    right:-5px;
+    top:3px;
+    width:3px;
+    height:7px;
+    background:#fff;
   }
 
-  .slot-number{
-    height:100%;
+  .screen{
+    background:var(--page);
+    padding:9px 9px 20px;
+  }
+
+  /* Occupied wearer card — proportions based on the supplied MSA photograph */
+  .wearer-card{
+    height:135px;
+    display:grid;
+    grid-template-columns:122px minmax(0,1fr) 114px;
+    background:#fff;
+  }
+
+  .number{
+    background:var(--green);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:31px;
+    font-size:40px;
     font-weight:300;
+    line-height:1;
   }
 
-  .slot-label{
-    font-size:26px;
-    font-style:italic;
+  .main{
+    background:#fff;
+    padding:20px 16px 11px;
+    min-width:0;
+  }
+
+  .pressure{
+    color:#111;
+    font-size:39px;
+    line-height:38px;
     font-weight:300;
-    padding-left:9px;
+    letter-spacing:-1.2px;
+    white-space:nowrap;
+  }
+  .pressure .unit{
+    font-size:25px;
+    letter-spacing:-.6px;
+    margin-left:2px;
+  }
+
+  .pressure-line{
+    width:100%;
+    height:7px;
+    background:var(--green);
+    margin-top:9px;
+  }
+
+  .lower{
+    display:flex;
+    align-items:center;
+    height:31px;
+    margin-top:6px;
+  }
+
+  .tow{
+    color:#555;
+    font-size:17px;
+    font-weight:300;
     white-space:nowrap;
   }
 
-  .bottom{
-    height:50px;
-    background:#050505;
+  .actions{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:30px;
+    padding-right:5px;
   }
 
-  @media(max-width:700px){
-    .sim-header{
-      height:50px;
-      padding:0 16px;
-      font-size:13px;
-    }
+  /* simple monochrome radio-wave glyph */
+  .radio{
+    width:22px;
+    height:18px;
+    position:relative;
+  }
+  .radio:before,
+  .radio:after{
+    content:"";
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:0;
+    border:2px solid #333;
+    border-bottom:0;
+    border-radius:18px 18px 0 0;
+  }
+  .radio:before{width:20px;height:13px}
+  .radio:after{width:11px;height:7px}
 
-    .sim-header-right{display:none}
+  .bin{
+    width:17px;
+    height:19px;
+    background:#222;
+    border-radius:1px 1px 2px 2px;
+    position:relative;
+  }
+  .bin:before{
+    content:"";
+    position:absolute;
+    left:-2px;
+    top:-4px;
+    width:21px;
+    height:3px;
+    background:#222;
+    border-radius:1px;
+  }
+  .bin:after{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:-7px;
+    width:7px;
+    height:2px;
+    background:#222;
+  }
 
-    .stage{
-      min-height:calc(100vh - 50px);
-      padding:0;
-      align-items:flex-start;
-    }
+  /* Actual emergency-exit/running-man style icon, drawn as SVG */
+  .evac{
+    border:0;
+    padding:0;
+    margin:0;
+    width:114px;
+    height:135px;
+    background:#666a6d;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+  }
 
-    .device{
-      width:100%;
-      max-width:650px;
-      border:0;
-      border-radius:0;
-      padding:0;
-      box-shadow:none;
-    }
+  .evac svg{
+    width:52px;
+    height:49px;
+    display:block;
+  }
 
-    .top{
-      height:142px;
-      padding:22px 31px;
-    }
+  .evac-label{
+    font-size:16px;
+    line-height:1;
+    font-weight:700;
+    letter-spacing:.15px;
+  }
 
-    .time{font-size:37px}
+  /* Empty slots retained in the MSA visual language */
+  .empty{
+    height:135px;
+    margin-top:9px;
+    background:var(--slot);
+    border-radius:14px;
+    display:grid;
+    grid-template-columns:122px 1fr;
+    align-items:center;
+    color:#fff;
+  }
+  .empty-number{
+    text-align:center;
+    font-size:40px;
+    font-weight:300;
+  }
+  .empty-text{
+    padding-left:16px;
+    font-size:29px;
+    font-style:italic;
+    font-weight:300;
+    letter-spacing:-.4px;
+  }
 
-    .content{
-      padding:11px 8px 8px;
-    }
-
-    .slot{
-      height:calc((100vh - 50px - 142px - 55px) / 6);
-      min-height:108px;
-      margin-bottom:8px;
-      border-radius:11px;
-      grid-template-columns:76px 1fr;
-    }
-
-    .slot-number{font-size:31px}
-    .slot-label{font-size:26px}
+  @media(max-width:650px){
+    .topbar{height:151px}
+    .wearer-card{grid-template-columns:22% minmax(0,1fr) 21%}
+    .empty{grid-template-columns:22% 1fr}
+    .number,.empty-number{font-size:31px}
+    .pressure{font-size:31px;line-height:31px}
+    .pressure .unit{font-size:20px}
+    .tow{font-size:14px}
+    .evac-label{font-size:12px}
+    .evac svg{width:43px;height:42px}
+    .empty-text{font-size:22px}
   }
 </style>
 </head>
-
 <body>
-  <header class="sim-header">
-    <div>ECB TRAINING SIMULATOR</div>
-    <div class="sim-header-right">ECP-ALPHA</div>
+<main class="device">
+  <header class="topbar">
+    <div class="hamburger" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="clock" id="clock">08:04</div>
+    <div class="battery"><span>43%</span><span class="battery-shape"></span></div>
   </header>
 
-  <main class="stage">
-    <section class="device">
-      <div class="screen">
+  <section class="screen">
+    <article class="wearer-card">
+      <div class="number">1</div>
 
-        <header class="top">
-          <div class="hamburger" aria-label="Menu">
-            <span></span>
-            <span></span>
-            <span></span>
+      <div class="main">
+        <div class="pressure">270<span class="unit">bar</span></div>
+        <div class="pressure-line"></div>
+
+        <div class="lower">
+          <div class="tow">TOW: 08:04</div>
+          <div class="actions">
+            <span class="radio" aria-label="radio signal"></span>
+            <span class="bin" aria-label="remove firefighter"></span>
           </div>
-
-          <div class="time" id="clock">07:28</div>
-
-          <div class="battery">43% ▣</div>
-        </header>
-
-        <section class="content">
-          <div class="slot"><div class="slot-number">1</div><div class="slot-label">Slot Available</div></div>
-          <div class="slot"><div class="slot-number">2</div><div class="slot-label">Slot Available</div></div>
-          <div class="slot"><div class="slot-number">3</div><div class="slot-label">Slot Available</div></div>
-          <div class="slot"><div class="slot-number">4</div><div class="slot-label">Slot Available</div></div>
-          <div class="slot"><div class="slot-number">5</div><div class="slot-label">Slot Available</div></div>
-          <div class="slot"><div class="slot-number">6</div><div class="slot-label">Slot Available</div></div>
-        </section>
-
-        <div class="bottom"></div>
+        </div>
       </div>
-    </section>
-  </main>
+
+      <button class="evac" type="button" aria-label="Evacuate">
+        <svg viewBox="0 0 64 58" aria-hidden="true">
+          <!-- emergency exit door -->
+          <path d="M42 8h14v42H42" fill="none" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M42 29H17" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+          <path d="M25 21l-8 8 8 8" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- running person -->
+          <circle cx="30" cy="12" r="4" fill="white"/>
+          <path d="M29 18l-4 10 8 5 7-5" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M27 27l-9 12" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+          <path d="M32 32l9 11" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span class="evac-label">EVACUATE</span>
+      </button>
+    </article>
+
+    <div class="empty"><div class="empty-number">2</div><div class="empty-text">Slot Available</div></div>
+    <div class="empty"><div class="empty-number">3</div><div class="empty-text">Slot Available</div></div>
+    <div class="empty"><div class="empty-number">4</div><div class="empty-text">Slot Available</div></div>
+    <div class="empty"><div class="empty-number">5</div><div class="empty-text">Slot Available</div></div>
+    <div class="empty"><div class="empty-number">6</div><div class="empty-text">Slot Available</div></div>
+  </section>
+</main>
 
 <script>
-  // Keep the visual starting state fixed to the supplied reference.
-  // The functionality will be added only after this baseline is approved.
-  document.getElementById("clock").textContent = "07:28";
+function tick(){
+  const d=new Date();
+  document.getElementById("clock").textContent =
+    String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+}
+tick();
+setInterval(tick,1000);
 </script>
 </body>
 </html>
